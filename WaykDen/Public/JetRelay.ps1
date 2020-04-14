@@ -28,6 +28,7 @@ class JetConfig
 
     [string] $DockerPlatform
     [string] $DockerIsolation
+    [string] $DockerRestartPolicy
     [string] $DockerImage
 }
 
@@ -38,8 +39,12 @@ function Set-JetConfig
         [string] $ConfigPath,
         [string] $JetInstance,
         [string[]] $JetListeners,
+        [ValidateSet("linux","windows")]
         [string] $DockerPlatform,
+        [ValidateSet("process","hyperv")]
         [string] $DockerIsolation,
+        [ValidateSet("no","on-failure","always","unless-stopped")]
+        [string] $DockerRestartPolicy,
         [string] $DockerImage,
         [string] $Force
     )
@@ -121,6 +126,10 @@ function Expand-JetConfig
         } else {
             $config.DockerPlatform = "linux"
         }
+    }
+
+    if (-Not $config.DockerRestartPolicy) {
+        $config.DockerRestartPolicy = "on-failure"
     }
 
     if (-Not $config.DockerImage) {
@@ -242,7 +251,7 @@ function Get-JetService
     $Service.Image = $config.DockerImage
     $Service.Platform = $config.DockerPlatform
     $Service.Isolation = $config.DockerIsolation
-    $Service.RestartPolicy = "on-failure"
+    $Service.RestartPolicy = $config.DockerRestartPolicy
     $Service.TargetPorts = @(10256)
 
     foreach ($JetListener in $config.JetListeners) {
