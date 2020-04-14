@@ -57,6 +57,7 @@ class DockerService
     [string] $Platform
     [string] $Isolation
     [string] $ContainerName
+    [string] $RestartPolicy
     [bool] $External
     [string[]] $DependsOn
     [string[]] $Networks
@@ -75,6 +76,7 @@ class DockerService
         $this.Platform = $other.Platform
         $this.Isolation = $other.Isolation
         $this.ContainerName = $other.ContainerName
+        $this.RestartPolicy = $other.RestartPolicy
 
         $this.External = $other.External
 
@@ -294,4 +296,124 @@ function Get-ContainerImageId()
 
     $Id = Invoke-Expression $cmd
     return $Id
+}
+
+function Test-DockerHost
+{
+    [CmdletBinding()]
+    param()
+
+    if (Get-IsWindows) {
+        $DnsServers = Get-DnsClientServerAddress -AddressFamily IPv4 | `
+            Select-Object -Unique -ExpandProperty ServerAddresses
+
+        if ($DnsServers -Contains '127.0.0.1') {
+            Write-Warning "A DNS server with address 127.0.0.1 is configured on the host."
+            Write-Warning "This is known to cause DNS resolution issues inside containers."
+            Write-Warning "Please use the host IP address from the host network instead."
+        }
+
+        $SEP = Get-ChildItem "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall" | `
+            ForEach-Object { Get-ItemProperty $_.PSPath } | `
+            Where-Object { $_ -Match 'Symantec Endpoint Protection' }
+
+        if ($SEP) {
+            Write-Warning "Symantec Endpoint Protection (SEP) has been detected."
+            Write-Warning "It is known to cause several issues with Docker for Windows."
+            Write-Warning "Removing the 'Application and Device Control' (ADC) component is recommended."
+            Write-Warning "Please refer to the following article for the relevant exclusions:"
+            Write-Warning "https://knowledge.broadcom.com/external/article?legacyId=TECH246815"
+            Write-Warning "You should also add %ProgramData%\docker to the exclusion list:"
+            Write-Warning "https://docs.docker.com/engine/security/antivirus/"
+            Write-Warning "At last, you can refer to the following blog article for further guidance:"
+            Write-Warning "https://mdaslam.wordpress.com/2017/05/23/docker-container-windows-2016-server-with-sep-symantec-endpoint-protection/"
+        }
+    }
+}
+
+function Get-DockerRunCommand
+{
+    [OutputType('string[]')]
+    param(
+        [DockerService] $Service
+    )
+
+    $cmd = @('docker', 'run')
+
+    $cmd += @('--name', $Service.ContainerName)
+
+    $cmd += "-d" # detached
+
+    if ($Service.Platform -eq 'windows') {
+        if ($Service.Isolation -eq 'hyperv') {
+            $cmd += "--isolation=$($Service.Isolation)"
+        }
+    }
+
+    if ($Service.RestartPolicy) {
+        $cmd += "--restart=$($Service.RestartPolicy)"
+    }
+
+    if ($Service.Networks) {
+        foreach ($Network in $Service.Networks) {
+            $cmd += "--network=$Network"
+        }
+    }
+
+    if ($Service.Environment) {
+        $Service.Environment.GetEnumerator() | foreach {
+            $key = $_.Key
+            $val = $_.Value
+            $cmd += @("-e", "`"$key=$val`"")
+        }
+    }
+
+    if ($Service.Volumes) {
+        foreach ($Volume in $Service.Volumes) {
+            $cmd += @("-v", "`"$Volume`"")
+        }
+    }
+
+    if ($Service.PublishAll) {
+        foreach ($TargetPort in $Service.TargetPorts) {
+            $cmd += @("-p", "$TargetPort`:$TargetPort")
+        }
+    }
+
+    if ($Service.Healthcheck) {
+        $Healthcheck = $Service.Healthcheck
+        if (![string]::IsNullOrEmpty($Healthcheck.Interval)) {
+            $cmd += "--health-interval=" + $Healthcheck.Interval
+        }
+        if (![string]::IsNullOrEmpty($Healthcheck.Timeout)) {
+            $cmd += "--health-timeout=" + $Healthcheck.Timeout
+        }
+        if (![string]::IsNullOrEmpty($Healthcheck.Retries)) {
+            $cmd += "--health-retries=" + $Healthcheck.Retries
+        }
+        if (![string]::IsNullOrEmpty($Healthcheck.StartPeriod)) {
+            $cmd += "--health-start-period=" + $Healthcheck.StartPeriod
+        }
+        $cmd += $("--health-cmd=`'" + $Healthcheck.Test + "`'")
+    }
+
+    if ($Service.Logging) {
+        $Logging = $Service.Logging
+        $cmd += '--log-driver=' + $Logging.Driver
+
+        $options = @()
+        $Logging.Options.GetEnumerator() | foreach {
+            $key = $_.Key
+            $val = $_.Value
+            $options += "$key=$val"
+        }
+
+        $options = $options -Join ","
+        $cmd += "--log-opt=" + $options
+    }
+
+    $cmd += $Service.Image
+    $cmd += $Service.Command
+
+    return $cmd
 }

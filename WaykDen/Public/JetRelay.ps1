@@ -13,9 +13,9 @@ function Get-JetImage
     )
 
     $image = if ($Platform -ne "windows") {
-        "devolutions/devolutions-jet:0.10.0-buster"
+        "devolutions/devolutions-jet:0.10.1-buster"
     } else {
-        "devolutions/devolutions-jet:0.10.0-servercore-ltsc2019"
+        "devolutions/devolutions-jet:0.10.1-servercore-ltsc2019"
     }
 
     return $image
@@ -27,6 +27,7 @@ class JetConfig
     [string[]] $JetListeners
 
     [string] $DockerPlatform
+    [string] $DockerIsolation
     [string] $DockerImage
 }
 
@@ -38,6 +39,7 @@ function Set-JetConfig
         [string] $JetInstance,
         [string[]] $JetListeners,
         [string] $DockerPlatform,
+        [string] $DockerIsolation,
         [string] $DockerImage,
         [string] $Force
     )
@@ -239,6 +241,8 @@ function Get-JetService
     $Service.ContainerName = 'devolutions-jet'
     $Service.Image = $config.DockerImage
     $Service.Platform = $config.DockerPlatform
+    $Service.Isolation = $config.DockerIsolation
+    $Service.RestartPolicy = "on-failure"
     $Service.TargetPorts = @(10256)
 
     foreach ($JetListener in $config.JetListeners) {
@@ -251,6 +255,7 @@ function Get-JetService
     $Service.Environment = [ordered]@{
         "JET_INSTANCE" = $config.JetInstance;
         "JET_UNRESTRICTED" = "true";
+        "RUST_BACKTRACE" = "1";
         "RUST_LOG" = "info";
     }
     $Service.Volumes = @("$ConfigPath/jet-relay:$JetRelayDataPath")
@@ -304,8 +309,10 @@ function Start-JetRelay
     $Service = Get-JetService -ConfigPath:$ConfigPath -Config:$config
 
     if (-Not $SkipPull) {
-        # pull docker image
-        Request-ContainerImage -Name $Service.Image
+        # pull docker images only if they are not cached locally
+        if (-Not (Get-ContainerImageId -Name $Service.Image)) {
+            Request-ContainerImage -Name $Service.Image
+        }
     }
 
     Start-DockerService -Service $Service -Remove
