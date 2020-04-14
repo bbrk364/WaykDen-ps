@@ -12,9 +12,9 @@ function Get-WaykDenImage
 
     $images = if ($Platform -ne "windows") {
         [ordered]@{ # Linux containers
-            "den-lucid" = "devolutions/den-lucid:3.6.6-buster-dev";
+            "den-lucid" = "devolutions/den-lucid:3.6.6-buster";
             "den-picky" = "devolutions/picky:4.2.1-buster";
-            "den-server" = "devolutions/den-server:1.18.0-buster-dev";
+            "den-server" = "devolutions/den-server:1.18.0-buster";
 
             "den-mongo" = "library/mongo:4.2-bionic";
             "den-traefik" = "library/traefik:1.7";
@@ -23,9 +23,9 @@ function Get-WaykDenImage
         }
     } else {
         [ordered]@{ # Windows containers
-            "den-lucid" = "devolutions/den-lucid:3.6.6-servercore-ltsc2019-dev";
+            "den-lucid" = "devolutions/den-lucid:3.6.6-servercore-ltsc2019";
             "den-picky" = "devolutions/picky:4.2.1-servercore-ltsc2019";
-            "den-server" = "devolutions/den-server:1.18.0-servercore-ltsc2019-dev";
+            "den-server" = "devolutions/den-server:1.18.0-servercore-ltsc2019";
 
             "den-mongo" = "library/mongo:4.2-windowsservercore-1809";
             "den-traefik" = "library/traefik:1.7-windowsservercore-1809";
@@ -82,6 +82,7 @@ function Get-WaykDenService
 
     $Platform = $config.DockerPlatform
     $Isolation = $config.DockerIsolation
+    $RestartPolicy = $config.DockerRestartPolicy
     $images = Get-WaykDenImage -Platform:$Platform
 
     $Realm = $config.Realm
@@ -136,6 +137,7 @@ function Get-WaykDenService
     $DenMongo.Image = $images[$DenMongo.ContainerName]
     $DenMongo.Platform = $Platform
     $DenMongo.Isolation = $Isolation
+    $DenMongo.RestartPolicy = $RestartPolicy
     $DenMongo.TargetPorts = @(27017)
     if ($DenNetwork -NotMatch "none") {
         $DenMongo.Networks += $DenNetwork
@@ -174,6 +176,7 @@ function Get-WaykDenService
         $DenNats.Image = $images[$DenNats.ContainerName]
         $DenNats.Platform = $Platform
         $DenNats.Isolation = $Isolation
+        $DenNats.RestartPolicy = $RestartPolicy
         if ($DenNetwork -NotMatch "none") {
             $DenNats.Networks += $DenNetwork
         } else {
@@ -189,6 +192,7 @@ function Get-WaykDenService
         $DenRedis.Image = $images[$DenRedis.ContainerName]
         $DenRedis.Platform = $Platform
         $DenRedis.Isolation = $Isolation
+        $DenRedis.RestartPolicy = $RestartPolicy
         if ($DenNetwork -NotMatch "none") {
             $DenRedis.Networks += $DenNetwork
         } else {
@@ -205,6 +209,7 @@ function Get-WaykDenService
     $DenPicky.Image = $images[$DenPicky.ContainerName]
     $DenPicky.Platform = $Platform
     $DenPicky.Isolation = $Isolation
+    $DenPicky.RestartPolicy = $RestartPolicy
     $DenPicky.DependsOn = @("den-mongo")
     $DenPicky.TargetPorts = @(12345)
     if ($DenNetwork -NotMatch "none") {
@@ -227,6 +232,7 @@ function Get-WaykDenService
     $DenLucid.Image = $images[$DenLucid.ContainerName]
     $DenLucid.Platform = $Platform
     $DenLucid.Isolation = $Isolation
+    $DenLucid.RestartPolicy = $RestartPolicy
     $DenLucid.DependsOn = @("den-mongo")
     $DenLucid.TargetPorts = @(4242)
     if ($DenNetwork -NotMatch "none") {
@@ -258,6 +264,7 @@ function Get-WaykDenService
     $DenServer.Image = $images[$DenServer.ContainerName]
     $DenServer.Platform = $Platform
     $DenServer.Isolation = $Isolation
+    $DenServer.RestartPolicy = $RestartPolicy
     $DenServer.DependsOn = @("den-mongo", 'den-traefik')
     $DenServer.TargetPorts = @(4491, 10255)
     if ($DenNetwork -NotMatch "none") {
@@ -380,6 +387,7 @@ function Get-WaykDenService
     $DenTraefik.Image = $images[$DenTraefik.ContainerName]
     $DenTraefik.Platform = $Platform
     $DenTraefik.Isolation = $Isolation
+    $DenTraefik.RestartPolicy = $RestartPolicy
     $DenTraefik.TargetPorts = @($TraefikPort)
     if ($DenNetwork -NotMatch "none") {
         $DenTraefik.Networks += $DenNetwork

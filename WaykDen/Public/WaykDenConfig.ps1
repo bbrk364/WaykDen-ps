@@ -65,6 +65,7 @@ class WaykDenConfig
     [string] $DockerNetwork
     [string] $DockerPlatform
     [string] $DockerIsolation
+    [string] $DockerRestartPolicy
     [string] $DockerHost
     [string] $SyslogServer
 }
@@ -192,6 +193,10 @@ function Expand-WaykDenConfig
         } else {
             $config.DockerPlatform = "linux"
         }
+    }
+
+    if (-Not $config.DockerRestartPolicy) {
+        $config.DockerRestartPolicy = "on-failure"
     }
 
     if (-Not $config.ServerMode) {
@@ -348,8 +353,12 @@ function New-WaykDenConfig
 
         # Docker
         [string] $DockerNetwork,
+        [ValidateSet("linux","windows")]
         [string] $DockerPlatform,
+        [ValidateSet("process","hyperv")]
         [string] $DockerIsolation,
+        [ValidateSet("no","on-failure","always","unless-stopped")]
+        [string] $DockerRestartPolicy,
         [string] $DockerHost,
         [string] $SyslogServer,
 
@@ -450,8 +459,12 @@ function Set-WaykDenConfig
 
         # Docker
         [string] $DockerNetwork,
+        [ValidateSet("linux","windows")]
         [string] $DockerPlatform,
+        [ValidateSet("process","hyperv")]
         [string] $DockerIsolation,
+        [ValidateSet("no","on-failure","always","unless-stopped")]
+        [string] $DockerRestartPolicy,
         [string] $DockerHost,
         [string] $SyslogServer,
 
