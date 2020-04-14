@@ -2,6 +2,12 @@
 
 This document provides a list of notable changes introduced in Wayk Den by release.
 
+== 2020.1.8 (2020-04-14)
+
+  * Add support for localhost access to Web UI in addition to external URL
+  * Fix importation of certificate chains that contain a single certificate
+  * Add docker restart policy (on-failure by default) parameter for containers
+
 == 2020.1.7 (2020-04-09)
 
   * Add docker isolation (hyperv, process) parameter for Windows containers
