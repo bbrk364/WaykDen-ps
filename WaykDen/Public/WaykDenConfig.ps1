@@ -531,5 +531,42 @@ function Get-WaykDenConfig
     return $config
 }
 
+function Clear-WaykDenConfig
+{
+    [CmdletBinding()]
+    param(
+        [string] $ConfigPath,
+        [Parameter(Mandatory=$true,Position=0)]
+        [string] $Filter
+    )
+
+    $ConfigPath = Find-WaykDenConfig -ConfigPath:$ConfigPath
+
+    $ConfigFile = Join-Path $ConfigPath "wayk-den.yml"
+    $ConfigData = Get-Content -Path $ConfigFile -Raw -ErrorAction Stop
+    $yaml = ConvertFrom-Yaml -Yaml $ConfigData -UseMergingParser -AllDocuments -Ordered
+
+    $config = [WaykDenConfig]::new()
+
+    [WaykDenConfig].GetProperties() | ForEach-Object {
+        $Name = $_.Name
+        if ($Name -NotLike $Filter) {
+            $snake_name = ConvertTo-SnakeCase -Value $Name
+            if ($yaml.Contains($snake_name)) {
+                if ($yaml.$snake_name -is [string]) {
+                    if (![string]::IsNullOrEmpty($yaml.$snake_name)) {
+                        $config.$Name = ($yaml.$snake_name).Trim()
+                    }
+                } else {
+                    $config.$Name = $yaml.$snake_name
+                }
+            }
+        }
+    }
+
+    # always force overwriting wayk-den.yml when updating the config file
+    ConvertTo-Yaml -Data (ConvertTo-SnakeCaseObject -Object $config) -OutFile $ConfigFile -Force
+}
+
 Export-ModuleMember -Function New-WaykDenConfig, Set-WaykDenConfig, Get-WaykDenConfig, `
-    Set-WaykDenConfigPath, Get-WaykDenPath
+    Clear-WaykDenConfig, Set-WaykDenConfigPath, Get-WaykDenPath

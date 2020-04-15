@@ -65,7 +65,8 @@
     
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
     FunctionsToExport = @('New-WaykDenConfig', 'Set-WaykDenConfig',
-        'Get-WaykDenConfig', 'Set-WaykDenConfigPath', 'Get-WaykDenPath',
+        'Get-WaykDenConfig', 'Clear-WaykDenConfig',
+        'Set-WaykDenConfigPath', 'Get-WaykDenPath',
         'Import-WaykDenCertificate', 'Import-WaykLdapCertificate',
         'Start-WaykDen', 'Stop-WaykDen', 'Restart-WaykDen', 'Update-WaykDen',
         'Register-WaykDenService', 'Unregister-WaykDenService',
