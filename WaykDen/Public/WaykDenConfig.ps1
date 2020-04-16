@@ -16,6 +16,7 @@ class WaykDenConfig
     [string] $DenServerUrl
     [string] $DenRouterUrl
     [string] $DenApiKey
+    [bool] $DisableTelemetry
     [bool] $ServerExternal
 
     # MongoDB
@@ -307,6 +308,7 @@ function New-WaykDenConfig
         [string] $DenServerUrl,
         [string] $DenRouterUrl,
         [string] $DenApiKey,
+        [bool] $DisableTelemetry,
         [bool] $ServerExternal,
 
         # MongoDB
@@ -413,6 +415,7 @@ function Set-WaykDenConfig
         [string] $DenServerUrl,
         [string] $DenRouterUrl,
         [string] $DenApiKey,
+        [bool] $DisableTelemetry,
         [bool] $ServerExternal,
 
         # MongoDB

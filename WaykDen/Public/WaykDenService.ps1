@@ -304,6 +304,10 @@ function Get-WaykDenService
         $DenServer.Command += " -m cloud"
     }
 
+    if ($config.DisableTelemetry) {
+        $DenServer.Environment['DEN_DISABLE_TELEMETRY'] = 'true'
+    }
+
     if (![string]::IsNullOrEmpty($config.LdapServerUrl)) {
         $DenServer.Environment['LDAP_SERVER_URL'] = $config.LdapServerUrl
     }
