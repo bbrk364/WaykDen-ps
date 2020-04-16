@@ -18,11 +18,17 @@ class WaykDenConfig
     [string] $DenApiKey
     [bool] $DisableTelemetry
     [bool] $ServerExternal
+    [string] $ServerImage
 
     # MongoDB
     [string] $MongoUrl
     [string] $MongoVolume
     [bool] $MongoExternal
+    [string] $MongoImage
+
+    # Traefik
+    [bool] $TraefikExternal
+    [string] $TraefikImage
 
     # Jet
     [string] $JetRelayUrl
@@ -43,6 +49,7 @@ class WaykDenConfig
     [string] $PickyUrl
     [string] $PickyApiKey
     [bool] $PickyExternal
+    [string] $PickyImage
 
     # Lucid
     [string] $LucidUrl
@@ -50,17 +57,20 @@ class WaykDenConfig
     [string] $LucidAdminUsername
     [string] $LucidAdminSecret
     [bool] $LucidExternal
+    [string] $LucidImage
 
     # NATS
     [string] $NatsUrl
     [string] $NatsUsername
     [string] $NatsPassword
     [bool] $NatsExternal
+    [string] $NatsImage
     
     # Redis
     [string] $RedisUrl
     [string] $RedisPassword
     [bool] $RedisExternal
+    [string] $RedisImage
 
     # Docker
     [string] $DockerNetwork
@@ -158,6 +168,43 @@ function Expand-WaykDenConfigKeys
     }
 }
 
+function Expand-WaykDenConfigImage
+{
+    param(
+        [WaykDenConfig] $Config
+    )
+
+    $images = Get-WaykDenImage -Config:$Config
+
+    if (-Not $config.LucidImage) {
+        $config.LucidImage = $images['den-lucid']
+    }
+    
+    if (-Not $config.PickyImage) {
+        $config.PickyImage = $images['den-picky']
+    }
+
+    if (-Not $config.ServerImage) {
+        $config.ServerImage = $images['den-server']
+    }
+
+    if (-Not $config.MongoImage) {
+        $config.MongoImage = $images['den-mongo']
+    }
+
+    if (-Not $config.TraefikImage) {
+        $config.TraefikImage = $images['den-traefik']
+    }
+
+    if (-Not $config.NatsImage) {
+        $config.NatsImage = $images['nats-image']
+    }
+
+    if (-Not $config.RedisImage) {
+        $config.RedisImage = $images['den-redis']
+    }
+}
+
 function Expand-WaykDenConfig
 {
     param(
@@ -243,6 +290,8 @@ function Expand-WaykDenConfig
     if (-Not $config.DenRouterUrl) {
         $config.DenRouterUrl = $DenRouterUrlDefault
     }
+
+    Expand-WaykDenConfigImage -Config:$Config
 }
 
 function Export-TraefikToml()
@@ -310,11 +359,17 @@ function New-WaykDenConfig
         [string] $DenApiKey,
         [bool] $DisableTelemetry,
         [bool] $ServerExternal,
+        [string] $ServerImage,
 
         # MongoDB
         [string] $MongoUrl,
         [string] $MongoVolume,
         [bool] $MongoExternal,
+        [string] $MongoImage,
+
+        # Traefik
+        [bool] $TraefikExternal,
+        [string] $TraefikImage,
 
         # Jet
         [string] $JetRelayUrl,
@@ -334,6 +389,7 @@ function New-WaykDenConfig
         [string] $PickyUrl,
         [string] $PickyApiKey,
         [bool] $PickyExternal,
+        [string] $PickyImage,
 
         # Lucid
         [string] $LucidUrl,
@@ -341,17 +397,20 @@ function New-WaykDenConfig
         [string] $LucidAdminUsername,
         [string] $LucidAdminSecret,
         [bool] $LucidExternal,
+        [string] $LucidImage,
 
         # NATS
         [string] $NatsUrl,
         [string] $NatsUsername,
         [string] $NatsPassword,
         [bool] $NatsExternal,
+        [string] $NatsImage,
         
         # Redis
         [string] $RedisUrl,
         [string] $RedisPassword,
         [bool] $RedisExternal,
+        [string] $RedisImage,
 
         # Docker
         [string] $DockerNetwork,
@@ -417,11 +476,17 @@ function Set-WaykDenConfig
         [string] $DenApiKey,
         [bool] $DisableTelemetry,
         [bool] $ServerExternal,
+        [string] $ServerImage,
 
         # MongoDB
         [string] $MongoUrl,
         [string] $MongoVolume,
         [bool] $MongoExternal,
+        [string] $MongoImage,
+
+        # Traefik
+        [bool] $TraefikExternal,
+        [string] $TraefikImage,
 
         # Jet
         [string] $JetRelayUrl,
@@ -441,6 +506,7 @@ function Set-WaykDenConfig
         [string] $PickyUrl,
         [string] $PickyApiKey,
         [bool] $PickyExternal,
+        [string] $PickyImage,
 
         # Lucid
         [string] $LucidUrl,
@@ -448,17 +514,20 @@ function Set-WaykDenConfig
         [string] $LucidAdminUsername,
         [string] $LucidAdminSecret,
         [bool] $LucidExternal,
+        [string] $LucidImage,
 
         # NATS
         [string] $NatsUrl,
         [string] $NatsUsername,
         [string] $NatsPassword,
         [bool] $NatsExternal,
+        [string] $NatsImage,
         
         # Redis
         [string] $RedisUrl,
         [string] $RedisPassword,
         [bool] $RedisExternal,
+        [string] $RedisImage,
 
         # Docker
         [string] $DockerNetwork,

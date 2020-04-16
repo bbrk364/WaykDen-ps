@@ -7,8 +7,10 @@
 function Get-WaykDenImage
 {
     param(
-        [string] $Platform
+        [WaykDenConfig] $Config
     )
+
+    $Platform = $config.DockerPlatform
 
     $images = if ($Platform -ne "windows") {
         [ordered]@{ # Linux containers
@@ -34,22 +36,50 @@ function Get-WaykDenImage
         }
     }
 
+    if ($config.LucidImage) {
+        $images['den-lucid'] = $config.LucidImage
+    }
+
+    if ($config.PickyImage) {
+        $images['den-picky'] = $config.PickyImage
+    }
+
+    if ($config.ServerImage) {
+        $images['den-server'] = $config.ServerImage
+    }
+
+    if ($config.MongoImage) {
+        $images['den-mongo'] = $config.MongoImage
+    }
+
+    if ($config.TraefikImage) {
+        $images['den-traefik'] = $config.TraefikImage
+    }
+
+    if ($config.NatsImage) {
+        $images['den-nats'] = $config.NatsImage
+    }
+
+    if ($config.RedisImage) {
+        $images['den-redis'] = $config.RedisImage
+    }
+
     return $images
 }
 
 function Get-HostInfo()
 {
     param(
-        [string] $Platform
+        [WaykDenConfig] $Config
     )
 
     $PSVersion = Get-PSVersion
     $CmdletVersion = Get-CmdletVersion
     $DockerVersion = Get-DockerVersion
-    $DockerPlatform = $Platform
+    $DockerPlatform = $config.DockerPlatform
     $OsVersionInfo = Get-OsVersionInfo
 
-    $images = Get-WaykDenImage -Platform:$Platform
+    $images = Get-WaykDenImage -Config:$Config
     $DenServerImage = $images['den-server']
     $DenPickyImage = $images['den-picky']
     $DenLucidImage = $images['den-lucid']
@@ -83,7 +113,7 @@ function Get-WaykDenService
     $Platform = $config.DockerPlatform
     $Isolation = $config.DockerIsolation
     $RestartPolicy = $config.DockerRestartPolicy
-    $images = Get-WaykDenImage -Platform:$Platform
+    $images = Get-WaykDenImage -Config:$Config
 
     $Realm = $config.Realm
     $ExternalUrl = $config.ExternalUrl
@@ -399,6 +429,7 @@ function Get-WaykDenService
     $DenTraefik.PublishAll = $true
     $DenTraefik.Volumes = @("$ConfigPath/traefik:$TraefikDataPath")
     $DenTraefik.Command = ("--file --configFile=" + $(@($TraefikDataPath, "traefik.toml") -Join $PathSeparator))
+    $DenTraefik.External = $config.TraefikExternal
     $Services += $DenTraefik
 
     if ($config.SyslogServer) {
