@@ -320,6 +320,27 @@ function Export-TraefikToml()
     Set-Content -Path $TraefikTomlFile -Value $TraefikToml
 }
 
+function Export-PickyConfig()
+{
+    param(
+        [string] $ConfigPath
+    )
+
+    $ConfigPath = Find-WaykDenConfig -ConfigPath:$ConfigPath
+
+    $config = Get-WaykDenConfig -ConfigPath:$ConfigPath
+    Expand-WaykDenConfig $config
+
+    $PickyPath = Join-Path $ConfigPath "picky"
+    New-Item -Path $PickyPath -ItemType "Directory" -Force | Out-Null
+
+    $DenServerPath = Join-Path $ConfigPath "den-server"
+    $DenServerPublicKey = Join-Path $DenServerPath "den-public.pem"
+
+    $PickyPublicKey = Join-Path $PickyPath "picky-public.pem"
+    Copy-Item -Path $DenServerPublicKey -Destination $PickyPublicKey -Force
+}
+
 function Export-HostInfo()
 {
     param(

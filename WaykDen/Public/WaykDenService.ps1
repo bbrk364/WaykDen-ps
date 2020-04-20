@@ -15,8 +15,8 @@ function Get-WaykDenImage
     $images = if ($Platform -ne "windows") {
         [ordered]@{ # Linux containers
             "den-lucid" = "devolutions/den-lucid:3.6.6-buster";
-            "den-picky" = "devolutions/picky:4.2.1-buster";
-            "den-server" = "devolutions/den-server:1.18.0-buster";
+            "den-picky" = "devolutions/picky:4.5.0-buster-dev";
+            "den-server" = "devolutions/den-server:1.19.0-buster-dev";
 
             "den-mongo" = "library/mongo:4.2-bionic";
             "den-traefik" = "library/traefik:1.7";
@@ -26,8 +26,8 @@ function Get-WaykDenImage
     } else {
         [ordered]@{ # Windows containers
             "den-lucid" = "devolutions/den-lucid:3.6.6-servercore-ltsc2019";
-            "den-picky" = "devolutions/picky:4.2.1-servercore-ltsc2019";
-            "den-server" = "devolutions/den-server:1.18.0-servercore-ltsc2019";
+            "den-picky" = "devolutions/picky:4.5.0-servercore-ltsc2019-dev";
+            "den-server" = "devolutions/den-server:1.19.0-servercore-ltsc2019-dev";
 
             "den-mongo" = "library/mongo:4.2-windowsservercore-1809";
             "den-traefik" = "library/traefik:1.7-windowsservercore-1809";
@@ -147,11 +147,13 @@ function Get-WaykDenService
         $MongoDataPath = "/data/db"
         $TraefikDataPath = "/etc/traefik"
         $DenServerDataPath = "/etc/den-server"
+        $PickyDataPath = "/etc/picky"
     } else {
         $PathSeparator = "\"
         $MongoDataPath = "c:\data\db"
         $TraefikDataPath = "c:\etc\traefik"
         $DenServerDataPath = "c:\den-server"
+        $PickyDataPath = "c:\picky"
     }
 
     $ServerCount = 1
@@ -251,8 +253,10 @@ function Get-WaykDenService
         "PICKY_REALM" = $Realm;
         "PICKY_API_KEY" = $PickyApiKey;
         "PICKY_DATABASE_URL" = $MongoUrl;
+        "PICKY_PROVISIONER_PUBLIC_KEY_PATH" = @($PickyDataPath, "picky-public.pem") -Join $PathSeparator
         "RUST_BACKTRACE" = $RustBacktrace;
     }
+    $DenPicky.Volumes = @("$ConfigPath/picky:$PickyDataPath`:ro")
     $DenPicky.External = $config.PickyExternal
     $Services += $DenPicky
 
@@ -321,6 +325,7 @@ function Get-WaykDenService
         "JET_SERVER_URL" = $JetServerUrl;
         "JET_RELAY_URL" = $JetRelayUrl;
         "DEN_API_KEY" = $DenApiKey;
+        "DEN_SERVER_VERSION" = "3";
         "RUST_BACKTRACE" = $RustBacktrace;
     }
     $DenServer.Volumes = @("$ConfigPath/den-server:$DenServerDataPath`:ro")
@@ -615,8 +620,8 @@ function Start-WaykDen
     $Platform = $config.DockerPlatform
     $Services = Get-WaykDenService -ConfigPath:$ConfigPath -Config $config
 
-    # update traefik.toml
     Export-TraefikToml -ConfigPath:$ConfigPath
+    Export-PickyConfig -ConfigPath:$ConfigPath
 
     $HostInfo = Get-HostInfo -Platform:$Platform
     Export-HostInfo -ConfigPath:$ConfigPath -HostInfo $HostInfo
