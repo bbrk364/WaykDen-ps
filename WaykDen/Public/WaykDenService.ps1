@@ -14,7 +14,7 @@ function Get-WaykDenImage
 
     $images = if ($Platform -ne "windows") {
         [ordered]@{ # Linux containers
-            "den-lucid" = "devolutions/den-lucid:3.6.6-buster";
+            "den-lucid" = "devolutions/den-lucid:3.7.2-buster";
             "den-picky" = "devolutions/picky:4.5.0-buster-dev";
             "den-server" = "devolutions/den-server:1.19.0-buster-dev";
 
@@ -25,7 +25,7 @@ function Get-WaykDenImage
         }
     } else {
         [ordered]@{ # Windows containers
-            "den-lucid" = "devolutions/den-lucid:3.6.6-servercore-ltsc2019";
+            "den-lucid" = "devolutions/den-lucid:3.7.2-servercore-ltsc2019";
             "den-picky" = "devolutions/picky:4.5.0-servercore-ltsc2019-dev";
             "den-server" = "devolutions/den-server:1.19.0-servercore-ltsc2019-dev";
 
@@ -286,6 +286,7 @@ function Get-WaykDenService
         "LUCID_ACCOUNT__FORGOT_PASSWORD_URL" = "$DenServerUrl/account/forgot";
         "LUCID_ACCOUNT__SEND_ACTIVATION_EMAIL_URL" = "$DenServerUrl/account/activation";
         "LUCID_LOCALHOST_LISTENER" = $ListenerScheme;
+        "LUCID_LOGIN__DEFAULT_LOCALE" = "en_US";
         "RUST_BACKTRACE" = $RustBacktrace;
     }
     $DenLucid.Healthcheck = [DockerHealthcheck]::new("curl -sS $LucidUrl/health")
