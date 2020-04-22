@@ -17,6 +17,7 @@ class WaykDenConfig
     [string] $DenRouterUrl
     [string] $DenApiKey
     [bool] $DisableTelemetry
+    [bool] $ExperimentalFeatures
     [bool] $ServerExternal
     [string] $ServerImage
 
@@ -379,6 +380,7 @@ function New-WaykDenConfig
         [string] $DenRouterUrl,
         [string] $DenApiKey,
         [bool] $DisableTelemetry,
+        [bool] $ExperimentalFeatures,
         [bool] $ServerExternal,
         [string] $ServerImage,
 
@@ -496,6 +498,7 @@ function Set-WaykDenConfig
         [string] $DenRouterUrl,
         [string] $DenApiKey,
         [bool] $DisableTelemetry,
+        [bool] $ExperimentalFeatures,
         [bool] $ServerExternal,
         [string] $ServerImage,
 

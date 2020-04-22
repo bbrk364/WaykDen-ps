@@ -326,7 +326,6 @@ function Get-WaykDenService
         "JET_SERVER_URL" = $JetServerUrl;
         "JET_RELAY_URL" = $JetRelayUrl;
         "DEN_API_KEY" = $DenApiKey;
-        "DEN_SERVER_VERSION" = "3";
         "RUST_BACKTRACE" = $RustBacktrace;
     }
     $DenServer.Volumes = @("$ConfigPath/den-server:$DenServerDataPath`:ro")
@@ -342,6 +341,12 @@ function Get-WaykDenService
 
     if ($config.DisableTelemetry) {
         $DenServer.Environment['DEN_DISABLE_TELEMETRY'] = 'true'
+    }
+
+    if ($config.ExperimentalFeatures) {
+        $DenServer.Environment['DEN_SERVER_VERSION'] = '3'
+        $DenServer.Environment['WIP_FEATURE_ENROLLMENT'] = 'true'
+        $DenServer.Environment['WIP_FEATURE_WAYK_CLIENT'] = 'true'
     }
 
     if (![string]::IsNullOrEmpty($config.LdapServerUrl)) {

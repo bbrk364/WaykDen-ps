@@ -16,14 +16,14 @@ Once you have been familiarized with Wayk Den, come back to this page for more d
 
 == Installation
 
-=== PowerShell Core
+=== PowerShell 7
 
-On Windows, the regular PowerShell already installed can be used. On macOS and Linux, you need PowerShell Core 6.0:
+On Windows, the regular PowerShell already installed can be used. On macOS and Linux, you will need PowerShell 7:
 
-PowerShell Core 6.0::
+PowerShell 7::
 https://github.com/PowerShell/PowerShell#get-powershell
 
-To launch a PowerShell Core terminal, use the `pwsh` command.
+To launch a PowerShell 7 terminal, use the `pwsh` command.
 
 === Wayk Den PowerShell module
 
@@ -39,7 +39,7 @@ Install-Module -Name WaykDen
 Import-Module WaykDen
 ----
 
-If you encounter issues with the `Install-Module` command, you may have to https://docs.microsoft.com/en-ca/powershell/gallery/installing-psget[install or update PowerShellGet].
+If you encounter issues with the `Install-Module` command, you may have to https://docs.microsoft.com/en-us/powershell/scripting/gallery/installing-psget[install or update PowerShellGet].
 
 You can then list all commands exported from the `WaykDen` module:
 

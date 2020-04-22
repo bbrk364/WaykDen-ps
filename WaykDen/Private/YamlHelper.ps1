@@ -293,14 +293,12 @@ public class StringQuotingEmitter: ChainedEventEmitter {
     }
 }
 "@
-
-$referenceList = @("System.Runtime.dll",
-    [YamlDotNet.Serialization.Serializer].Assembly.Location,
-    [Text.RegularExpressions.Regex].Assembly.Location)
     
 if ($PSVersionTable.PSEdition -eq "Core") {
+    $referenceList = @([YamlDotNet.Serialization.Serializer].Assembly.Location, [Text.RegularExpressions.Regex].Assembly.Location)
     Add-Type -TypeDefinition $stringQuotingEmitterSource -ReferencedAssemblies $referenceList -Language CSharp -CompilerOptions "-nowarn:1701"
 } else {
+    $referenceList = @("System.Runtime.dll", [YamlDotNet.Serialization.Serializer].Assembly.Location, [Text.RegularExpressions.Regex].Assembly.Location)
     Add-Type -TypeDefinition $stringQuotingEmitterSource -ReferencedAssemblies $referenceList -Language CSharp
 }
 

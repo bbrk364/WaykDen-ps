@@ -7,7 +7,7 @@
     RootModule = 'WaykDen.psm1'
     
     # Version number of this module.
-    ModuleVersion = '2020.1.8'
+    ModuleVersion = '2020.1.9'
 
     # Supported PSEditions
     CompatiblePSEditions = 'Desktop', 'Core'
