@@ -330,7 +330,7 @@ function Get-WaykDenService
         "RUST_BACKTRACE" = $RustBacktrace;
     }
     $DenServer.Volumes = @("$ConfigPath/den-server:$DenServerDataPath`:ro")
-    $DenServer.Command = "-l trace"
+    $DenServer.Command = "-l info"
     $DenServer.Healthcheck = [DockerHealthcheck]::new("curl -sS $DenServerUrl/health")
 
     if ($config.ServerMode -eq 'Private') {
