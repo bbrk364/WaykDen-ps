@@ -2,6 +2,10 @@
 
 This document provides a list of notable changes introduced in Wayk Den by release.
 
+== 2020.1.10 (unreleased)
+
+  * Fix Backup-WaykDenData/Restore-WaykDenData commands path handling
+
 == 2020.1.9 (2020-04-22)
 
   * Add basic telemetry support that can be disabled in the configuration

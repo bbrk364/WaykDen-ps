@@ -18,7 +18,7 @@ function Backup-WaykDenData
     $Services = Get-WaykDenService -ConfigPath:$ConfigPath -Config $config
 
     $Service = ($Services | Where-Object { $_.ContainerName -Like '*mongo' })[0]
-    $container = $Service.ContainerName
+    $ContainerName = $Service.ContainerName
 
     if ($Platform -eq "linux") {
         $PathSeparator = "/"
@@ -32,6 +32,8 @@ function Backup-WaykDenData
         $BackupPath = Get-Location
     }
 
+    $BackupPath = $PSCmdlet.GetUnresolvedProviderPathFromPSPath($BackupPath)
+
     $BackupFileName = "den-mongo.tgz"
     if (($BackupPath -match ".tgz") -or ($BackupPath -match ".tar.gz")) {
         $BackupFileName = Split-Path -Path $BackupPath -Leaf
@@ -41,15 +43,19 @@ function Backup-WaykDenData
 
     $TempBackupPath = @($TempPath, $BackupFileName) -Join $PathSeparator
 
+    if (-Not (Get-ContainerIsRunning -Name $ContainerName)) {
+        Start-DockerService $Service -Remove
+    }
+
     # make sure parent output directory exists
     New-Item -Path $(Split-Path -Path $BackupPath) -ItemType "Directory" -Force | Out-Null
 
-    $args = @('docker', 'exec', $container, 'mongodump', '--gzip', "--archive=${TempBackupPath}")
+    $args = @('docker', 'exec', $ContainerName, 'mongodump', '--gzip', "--archive=${TempBackupPath}")
     $cmd = $args -Join " "
     Write-Verbose $cmd
     Invoke-Expression $cmd
 
-    $args = @('docker', 'cp', "$container`:$TempBackupPath", $BackupPath)
+    $args = @('docker', 'cp', "$ContainerName`:$TempBackupPath", "`"$BackupPath`"")
     $cmd = $args -Join " "
     Write-Verbose $cmd
     Invoke-Expression $cmd
@@ -83,6 +89,7 @@ function Restore-WaykDenData
     }
 
     $BackupFileName = "den-mongo.tgz"
+    $BackupPath = $PSCmdlet.GetUnresolvedProviderPathFromPSPath($BackupPath)
 
     if (($BackupPath -match ".tgz") -or ($BackupPath -match ".tar.gz")) {
         $BackupFileName = Split-Path -Path $BackupPath -Leaf
@@ -93,14 +100,14 @@ function Restore-WaykDenData
     $TempBackupPath = @($TempPath, $BackupFileName) -Join $PathSeparator
 
     if (-Not (Get-ContainerIsRunning -Name $ContainerName)) {
-        Start-DockerService $Service
+        Start-DockerService $Service -Remove
     }
 
     if (-Not (Test-Path -Path $BackupPath -PathType 'Leaf')) {
         throw "$BackupPath does not exist"
     }
 
-    $args = @('docker', 'cp', $BackupPath, "$ContainerName`:$TempBackupPath")
+    $args = @('docker', 'cp', "`"$BackupPath`"", "$ContainerName`:$TempBackupPath")
     $cmd = $args -Join " "
     Write-Verbose $cmd
     Invoke-Expression $cmd
