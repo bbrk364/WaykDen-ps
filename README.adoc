@@ -1,5 +1,6 @@
 :toc:
 :toclevels: 4
+:imagesdir: docs/images
 
 = Wayk Den PowerShell Cmdlet
 
@@ -61,13 +62,10 @@ Restart-WaykDen
 
 If you have installed the module from PSGallery, this section is not useful for you. You can jump to the next section. 
 
-To build the Cmdlet, you will need the .NET Core 2.2 SDK and the .NET Framework 4.7.2 SDK. The latter is only needed if you want to support PowerShell for Windows.
+To build the Cmdlet, you will need the .NET Core 2.2 SDK. The latter is only needed if you want to support PowerShell for Windows.
 
  .NET Core 2.2 SDK::
 https://dotnet.microsoft.com/download
-
- .NET Framework 4.7.2 SDK::
-https://dotnet.microsoft.com/download/dotnet-framework/net472
 
 From PowerShell, run the build.ps1 script, and then load the resulting PowerShell module:
 
@@ -113,6 +111,8 @@ $ Start-Service -Name docker
 
 On Windows 10, the recommended option is to use https://hub.docker.com/editions/community/docker-ce-desktop-windows[Docker Desktop for Windows]. This version of Docker requires Hyper-V for Linux container support, making it suitable for testing on a physical machine, but not so much for a virtual machine because of limited support of Docker Desktop for Windows in virtualized environments. If you want to try Wayk Den inside a virtual machine, use Windows Server 2019 instead with Windows containers.
 
+One important thing to know about Docker for Windows is that you need to https://docs.docker.com/docker-for-windows/#switch-between-windows-and-linux-containers[switch to Windows containers] instead of the default (Linux containers). Trying to launch Windows containers when Linux containers are enabled will result in a "no matching manifest for windows/amd64" error.
+
 For bind mount support with Linux containers on Windows, you need to go in the Docker settings and https://rominirani.com/docker-on-windows-mounting-host-directories-d96f3f056a2c[select the required drives from the "Shared Drives" section].
 
 ==== macOS
@@ -124,6 +124,26 @@ On macOS, follow the official https://docs.docker.com/docker-for-mac/[Docker Des
 On Linux, follow one of the https://docs.docker.com/install/linux/docker-ce/ubuntu/[distribution-specific getting started guides], then do not forget to https://docs.docker.com/install/linux/linux-postinstall/[add your user to the docker group] after installation.
 
 To confirm that Docker is up and running, use the `docker run hello-world` command. If you don't see the "Hello from Docker!" message, something is wrong with your Docker installation.
+
+== Deployment
+
+Before jumping in to the configuration, let's review the different deployment options.
+
+===  Wayk Den
+
+.Wayk Den Layer 4 deployment
+image::wayk_den_l4_deployment.png[Wayk Den L4/TCP deployment]
+
+.Wayk Den Layer 7 deployment
+image::wayk_den_l7_deployment.png[Wayk Den L7/TCP deployment]
+
+=== Jet Relay
+
+.Jet Relay Layer 4 Deployment
+image::jet_relay_l4_deployment.png[Jet Relay L4/TCP deployment]
+
+.Jet Relay Layer 7 deployment
+image::jet_relay_l7_deployment.png[Jet Relay L4/TCP deployment]
 
 == Configuration
 
@@ -143,6 +163,12 @@ PS > New-WaykDenConfig -Realm contoso.net -ExternalUrl https://den.contoso.net -
 ----
 
 The listener url is used to specify the listening protocol and port on the machine where Wayk Den is running. To listen in https, a certificate needs to be imported before changing the listener URL protocol.
+
+=== Initial setup
+
+When accessing the Web UI for the first time, login using the default username ("wayk-admin") and password ("wayk-admin"), after which you will be asked to create your own admin account with a new password.
+
+It should also be noted that you can access the Wayk Den Web UI locally through the configured listener URL (http://localhost:4000 by default) for convenience, as an intermediate step before configuring the external URL.
 
 === Certificate configuration
 
