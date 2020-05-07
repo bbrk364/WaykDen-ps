@@ -129,6 +129,10 @@ To confirm that Docker is up and running, use the `docker run hello-world` comma
 
 Before jumping in to the configuration, let's review the different deployment options.
 
+Layer 4 deployment: Expose services externally through TCP (layer 4) and handle HTTPS inside Wayk Den.
+
+Layer 7 deployment: Expose services externally through a layer 7 reverse proxy (HTTPS) that offloads TLS from Wayk Den.
+
 ===  Wayk Den
 
 .Wayk Den Layer 4 deployment
@@ -166,7 +170,13 @@ The listener url is used to specify the listening protocol and port on the machi
 
 === Initial setup
 
-When accessing the Web UI for the first time, login using the default username ("wayk-admin") and password ("wayk-admin"), after which you will be asked to create your own admin account with a new password.
+When accessing the Web UI for the first time, login using the default username ("wayk-admin") and password ("wayk-admin"):
+
+image::den_initial_login.png[Wayk Den initial login]
+
+You will then be asked to create your first admin account to replace the default one:
+
+image::den_initial_admin.png[Wayk Den initial admin]
 
 It should also be noted that you can access the Wayk Den Web UI locally through the configured listener URL (http://localhost:4000 by default) for convenience, as an intermediate step before configuring the external URL.
 
