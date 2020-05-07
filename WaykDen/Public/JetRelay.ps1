@@ -13,9 +13,9 @@ function Get-JetImage
     )
 
     $image = if ($Platform -ne "windows") {
-        "devolutions/devolutions-jet:0.10.1-buster"
+        "devolutions/devolutions-jet:0.10.2-buster"
     } else {
-        "devolutions/devolutions-jet:0.10.1-servercore-ltsc2019"
+        "devolutions/devolutions-jet:0.10.2-servercore-ltsc2019"
     }
 
     return $image
@@ -69,9 +69,10 @@ function Set-JetConfig
             $config.($param.Key) = $param.Value
         }
     }
-
-    ConvertTo-Yaml -Data $config -OutFile "$ConfigFile-2" -Force
  
+    $JetRelayPath = Join-Path $ConfigPath "jet-relay"
+    New-Item -Path $JetRelayPath -ItemType "Directory" -Force | Out-Null
+
     # always force overwriting jet-relay.yml when updating the config file
     ConvertTo-Yaml -Data (ConvertTo-SnakeCaseObject -Object $config) -OutFile $ConfigFile -Force
 }
