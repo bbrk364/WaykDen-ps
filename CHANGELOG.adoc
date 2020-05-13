@@ -2,8 +2,9 @@
 
 This document provides a list of notable changes introduced in Wayk Den by release.
 
-== 2020.1.10 (unreleased)
+== 2020.1.10 (2020-05-13)
 
+  * Fix Devolutions Jet relay panic on aborted TLS/WSS handshakes
   * Fix Backup-WaykDenData/Restore-WaykDenData commands path handling
 
 == 2020.1.9 (2020-04-22)
