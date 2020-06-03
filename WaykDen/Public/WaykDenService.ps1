@@ -182,6 +182,11 @@ function Get-WaykDenService
 
     if (($config.ServerMode -eq 'Public') -or ($ServerCount -gt 1)) {
 
+        if (($config.DockerNetwork -Match "none") -and $config.DockerHost) {
+            $config.NatsUrl = $config.DockerHost
+            $config.RedisUrl = $config.DockerHost
+        }
+
         if (-Not $config.NatsUrl) {
             $config.NatsUrl = "den-nats"
         }
