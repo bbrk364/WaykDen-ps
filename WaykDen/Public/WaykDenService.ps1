@@ -182,6 +182,11 @@ function Get-WaykDenService
 
     if (($config.ServerMode -eq 'Public') -or ($ServerCount -gt 1)) {
 
+        if (($config.DockerNetwork -Match "none") -and $config.DockerHost) {
+            $config.NatsUrl = $config.DockerHost
+            $config.RedisUrl = $config.DockerHost
+        }
+
         if (-Not $config.NatsUrl) {
             $config.NatsUrl = "den-nats"
         }
@@ -209,6 +214,7 @@ function Get-WaykDenService
         $DenNats.Platform = $Platform
         $DenNats.Isolation = $Isolation
         $DenNats.RestartPolicy = $RestartPolicy
+        $DenNats.TargetPorts = @(4222)
         if ($DenNetwork -NotMatch "none") {
             $DenNats.Networks += $DenNetwork
         } else {
@@ -225,6 +231,7 @@ function Get-WaykDenService
         $DenRedis.Platform = $Platform
         $DenRedis.Isolation = $Isolation
         $DenRedis.RestartPolicy = $RestartPolicy
+        $DenRedis.TargetPorts = @(6379)
         if ($DenNetwork -NotMatch "none") {
             $DenRedis.Networks += $DenNetwork
         } else {
