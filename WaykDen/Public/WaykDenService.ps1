@@ -12,26 +12,35 @@ function Get-WaykDenImage
 
     $Platform = $config.DockerPlatform
 
+    $LucidVersion = '3.7.2'
+    $PickyVersion = '4.5.0'
+    $ServerVersion = '2.2.0'
+
+    $MongoVersion = '4.2'
+    $TraefikVersion = '1.7'
+    $NatsVersion = '2.1'
+    $RedisVersion = '5.0'
+
     $images = if ($Platform -ne "windows") {
         [ordered]@{ # Linux containers
-            "den-lucid" = "devolutions/den-lucid:3.7.2-buster";
-            "den-picky" = "devolutions/picky:4.5.0-buster";
-            "den-server" = "devolutions/den-server:1.20.0-buster";
+            "den-lucid" = "devolutions/den-lucid:${LucidVersion}-buster";
+            "den-picky" = "devolutions/picky:${PickyVersion}-buster";
+            "den-server" = "devolutions/den-server:${ServerVersion}-buster";
 
-            "den-mongo" = "library/mongo:4.2-bionic";
-            "den-traefik" = "library/traefik:1.7";
-            "den-nats" = "library/nats:2.1-linux";
-            "den-redis" = "library/redis:5.0-buster";
+            "den-mongo" = "library/mongo:${MongoVersion}-bionic";
+            "den-traefik" = "library/traefik:${TraefikVersion}";
+            "den-nats" = "library/nats:${NatsVersion}-linux";
+            "den-redis" = "library/redis:${RedisVersion}-buster";
         }
     } else {
         [ordered]@{ # Windows containers
-            "den-lucid" = "devolutions/den-lucid:3.7.2-servercore-ltsc2019";
-            "den-picky" = "devolutions/picky:4.5.0-servercore-ltsc2019";
-            "den-server" = "devolutions/den-server:1.20.0-servercore-ltsc2019";
+            "den-lucid" = "devolutions/den-lucid:${LucidVersion}-servercore-ltsc2019";
+            "den-picky" = "devolutions/picky:${PickyVersion}-servercore-ltsc2019";
+            "den-server" = "devolutions/den-server:${ServerVersion}-servercore-ltsc2019";
 
-            "den-mongo" = "library/mongo:4.2-windowsservercore-1809";
-            "den-traefik" = "library/traefik:1.7-windowsservercore-1809";
-            "den-nats" = "library/nats:2.1-windowsservercore-1809";
+            "den-mongo" = "library/mongo:${MongoVersion}-windowsservercore-1809";
+            "den-traefik" = "library/traefik:${TraefikVersion}-windowsservercore-1809";
+            "den-nats" = "library/nats:${NatsVersion}-windowsservercore-1809";
             "den-redis" = ""; # not available
         }
     }

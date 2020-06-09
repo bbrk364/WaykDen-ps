@@ -2,6 +2,23 @@
 
 This document provides a list of notable changes introduced in Wayk Den by release.
 
+== 2020.2.0 (2020-06-10)
+
+  * Add new revised and improved Den V3 protocol support
+  * Change Wayk Now minimum client requirement to 2020.2.x
+  * Change Wayk Now minimum server requirement to 2020.1.x
+  * Add new Wayk Now web client in Web UI (preview feature)
+  * Add new "Machine User Login" role mandatory for client connections
+  * Add automatic publishing of white label branding file from server
+  * Add LDAP account provider configuration in Web UI instead of cmdlet
+  * Add LDAP configuration test button in Web UI to validation parameters
+  * Add Devolutions Jet relay configuration in Web UI instead of cmdlet
+  * Add detailed system information with component versions in Web UI
+  * Add client user name and server machine name information in "Sessions"
+  * Move list of all clients to "Clients" section to replace "Connections"
+  * Move list of all servers (machines) to "All servers" section of Web UI
+  * Fix Devolutions Jet relay potential WebSocket transport data corruption
+
 == 2020.1.10 (2020-05-13)
 
   * Fix Devolutions Jet relay panic on aborted TLS/WSS handshakes
