@@ -12,10 +12,12 @@ function Get-JetImage
         [string] $Platform
     )
 
+    $Version = '0.11.0'
+
     $image = if ($Platform -ne "windows") {
-        "devolutions/devolutions-jet:0.10.9-buster"
+        "devolutions/devolutions-jet:${Version}-buster"
     } else {
-        "devolutions/devolutions-jet:0.10.9-servercore-ltsc2019"
+        "devolutions/devolutions-jet:${Version}-servercore-ltsc2019"
     }
 
     return $image
