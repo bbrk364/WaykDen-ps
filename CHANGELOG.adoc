@@ -5,7 +5,10 @@ This document provides a list of notable changes introduced in Wayk Den by relea
 == 2020.2.0 (2020-06-10)
 
   * Add new revised and improved Den V3 protocol support
+  * Change Wayk Now minimum client requirement to 2020.2.x
+  * Change Wayk Now minimum server requirement to 2020.1.x
   * Add new Wayk Now web client in Web UI (preview feature)
+  * Add new "Machine User Login" role mandatory for client connections
   * Add automatic publishing of white label branding file from server
   * Add LDAP account provider configuration in Web UI instead of cmdlet
   * Add LDAP configuration test button in Web UI to validation parameters
