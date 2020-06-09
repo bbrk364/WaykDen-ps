@@ -14,7 +14,7 @@ function Get-WaykDenImage
 
     $LucidVersion = '3.7.2'
     $PickyVersion = '4.5.0'
-    $ServerVersion = '2.1.0'
+    $ServerVersion = '2.2.0'
 
     $MongoVersion = '4.2'
     $TraefikVersion = '1.7'
