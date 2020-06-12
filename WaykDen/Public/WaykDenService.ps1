@@ -683,6 +683,9 @@ function Stop-WaykDen
 
     $Services = Get-WaykDenService -ConfigPath:$ConfigPath -Config $config
 
+    # containers have to be stopped in the reverse order that we started them
+    [array]::Reverse($Services)
+
     # stop containers
     foreach ($Service in $Services) {
         if ($Service.External) {
