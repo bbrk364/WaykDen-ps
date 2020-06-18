@@ -2,6 +2,14 @@
 
 This document provides a list of notable changes introduced in Wayk Den by release.
 
+== 2020.2.1 (2020-06-18)
+
+  * Improve Active Directory user synchronization
+  * Add `Domain Users` as default group for Active Directory
+  * Add a server description that can be edited in Web UI interface
+  * Add a background in Wayk Now web client
+  * Fix machine route to return all servers on private Den
+  
 == 2020.2.0 (2020-06-10)
 
   * Add new revised and improved Den V3 protocol support
