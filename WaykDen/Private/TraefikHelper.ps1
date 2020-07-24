@@ -8,7 +8,8 @@ function New-TraefikToml
         [string] $LucidUrl,
         [string] $PickyUrl,
         [string] $DenRouterUrl,
-        [string] $DenServerUrl
+        [string] $DenServerUrl,
+        [bool] $JetExternal
     )
 
     $url = [System.Uri]::new($ListenerUrl)

@@ -21,6 +21,8 @@ function Get-WaykDenImage
     $NatsVersion = '2.1'
     $RedisVersion = '5.0'
 
+    $JetVersion = '0.11.0' # Update Get-JetImage as well
+
     $images = if ($Platform -ne "windows") {
         [ordered]@{ # Linux containers
             "den-lucid" = "devolutions/den-lucid:${LucidVersion}-buster";
@@ -31,6 +33,8 @@ function Get-WaykDenImage
             "den-traefik" = "library/traefik:${TraefikVersion}";
             "den-nats" = "library/nats:${NatsVersion}-linux";
             "den-redis" = "library/redis:${RedisVersion}-buster";
+
+            "devolutions-jet" = "devolutions/devolutions-jet:${JetVersion}-buster";
         }
     } else {
         [ordered]@{ # Windows containers
@@ -42,6 +46,8 @@ function Get-WaykDenImage
             "den-traefik" = "library/traefik:${TraefikVersion}-windowsservercore-1809";
             "den-nats" = "library/nats:${NatsVersion}-windowsservercore-1809";
             "den-redis" = ""; # not available
+
+            "devolutions-jet" = "devolutions/devolutions-jet:${JetVersion}-servercore-ltsc2019";
         }
     }
 
@@ -71,6 +77,10 @@ function Get-WaykDenImage
 
     if ($config.RedisImage) {
         $images['den-redis'] = $config.RedisImage
+    }
+
+    if ($config.JetRelayImage) {
+        $images['devolutions-jet'] = $config.JetRelayImage
     }
 
     return $images
@@ -458,6 +468,50 @@ function Get-WaykDenService
     $DenTraefik.Command = ("--file --configFile=" + $(@($TraefikDataPath, "traefik.toml") -Join $PathSeparator))
     $DenTraefik.External = $config.TraefikExternal
     $Services += $DenTraefik
+
+    # jet relay service
+    if (-Not $config.JetExternal) {
+        $url = [System.Uri]::new($config.ExternalUrl)
+        $JetInstance = $url.Host
+        $JetWssPort = $url.Port
+        $JetTcpPort = 8080
+
+        $JetListeners = @()
+        #$JetListeners += "tcp://0.0.0.0:$JetTcpPort";
+        $JetListeners += "ws://0.0.0.0:7171,wss://<jet_instance>:$JetWssPort"
+
+        $JetRelay = [DockerService]::new()
+        $JetRelay.ContainerName = 'devolutions-jet'
+        $JetRelay.Image = $images[$JetRelay.ContainerName]
+        $JetRelay.Platform = $Platform
+        $JetRelay.Isolation = $Isolation
+        $JetRelay.RestartPolicy = $RestartPolicy
+        $JetRelay.TargetPorts = @(10256,$JetTcpPort)
+
+        foreach ($JetListener in $JetListeners) {
+            $ListenerUrl = ([string[]] $($JetListener -Split ','))[0]
+            $url = [System.Uri]::new($ListenerUrl)
+            $JetRelay.TargetPorts += @($url.Port)
+        }
+
+        $JetRelay.PublishAll = $true
+        $JetRelay.Environment = [ordered]@{
+            "JET_INSTANCE" = $JetInstance;
+            "JET_UNRESTRICTED" = "true";
+            "RUST_BACKTRACE" = "1";
+            "RUST_LOG" = "info";
+        }
+        $JetRelay.External = $false
+
+        $args = @()
+        foreach ($JetListener in $JetListeners) {
+            $args += @('-l', "`"$JetListener`"")
+        }
+
+        $JetRelay.Command = $($args -Join " ")
+
+        $Services += $JetRelay
+    }
 
     if ($config.SyslogServer) {
         foreach ($Service in $Services) {

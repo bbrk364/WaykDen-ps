@@ -32,8 +32,9 @@ class WaykDenConfig
     [string] $TraefikImage
 
     # Jet
+    [bool] $JetExternal
     [string] $JetRelayUrl
-    [string] $JetServerUrl
+    [string] $JetRelayImage
 
     # LDAP
     [string] $LdapServerUrl
@@ -217,7 +218,6 @@ function Expand-WaykDenConfig
     $MongoVolumeDefault = "den-mongodata"
     $ServerModeDefault = "Private"
     $ListenerUrlDefault = "http://0.0.0.0:4000"
-    $JetServerUrlDefault = "api.jet-relay.net:8080"
     $JetRelayUrlDefault = "https://api.jet-relay.net"
     $PickyUrlDefault = "http://den-picky:12345"
     $LucidUrlDefault = "http://den-lucid:4242"
@@ -268,14 +268,6 @@ function Expand-WaykDenConfig
         $config.MongoVolume = $MongoVolumeDefault
     }
 
-    if (-Not $config.JetServerUrl) {
-        $config.JetServerUrl = $JetServerUrlDefault
-    }
-
-    if (-Not $config.JetRelayUrl) {
-        $config.JetRelayUrl = $JetRelayUrlDefault
-    }
-
     if (-Not $config.PickyUrl) {
         $config.PickyUrl = $PickyUrlDefault
     }
@@ -290,6 +282,16 @@ function Expand-WaykDenConfig
 
     if (-Not $config.DenRouterUrl) {
         $config.DenRouterUrl = $DenRouterUrlDefault
+    }
+
+    if (-Not $config.JetRelayUrl) {
+        if ($config.JetExternal) {
+            $config.JetRelayUrl = $JetRelayUrlDefault
+        } else {
+            if ($config.ExternalUrl) {
+                $config.JetRelayUrl = $config.ExternalUrl
+            }
+        }
     }
 
     Expand-WaykDenConfigImage -Config:$Config
@@ -395,7 +397,9 @@ function New-WaykDenConfig
         [string] $TraefikImage,
 
         # Jet
+        [bool] $JetExternal,
         [string] $JetRelayUrl,
+        [string] $JetRelayImage,
 
         # LDAP
         [string] $LdapServerUrl,
@@ -513,7 +517,9 @@ function Set-WaykDenConfig
         [string] $TraefikImage,
 
         # Jet
+        [bool] $JetExternal,
         [string] $JetRelayUrl,
+        [string] $JetRelayImage,
 
         # LDAP
         [string] $LdapServerUrl,

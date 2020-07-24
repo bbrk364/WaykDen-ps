@@ -12,12 +12,12 @@ function Get-JetImage
         [string] $Platform
     )
 
-    $Version = '0.11.0'
+    $JetVersion = '0.11.0' # Update Get-WaykDenImage as well
 
     $image = if ($Platform -ne "windows") {
-        "devolutions/devolutions-jet:${Version}-buster"
+        "devolutions/devolutions-jet:${JetVersion}-buster"
     } else {
-        "devolutions/devolutions-jet:${Version}-servercore-ltsc2019"
+        "devolutions/devolutions-jet:${JetVersion}-servercore-ltsc2019"
     }
 
     return $image
