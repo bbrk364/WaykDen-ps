@@ -2,6 +2,13 @@
 
 This document provides a list of notable changes introduced in Wayk Den by release.
 
+== 2020.2.3 (2020-07-30)
+  * Add Wayk Den enrolment token support
+  * Allow Active Directory user to open a session with his credentials
+  * Add alias support
+  ** Auto-alias with machine name for all servers
+  ** Auto-alias with fully qualified name (machine_name.domain.loc) for Windows servers
+
 == 2020.2.2 (2020-07-06)
   * Fix User-Agent parsing
   * Fix an issue where an old client moving to 2020.2.0 had its Den ID reset
