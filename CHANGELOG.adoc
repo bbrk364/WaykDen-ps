@@ -2,6 +2,12 @@
 
 This document provides a list of notable changes introduced in Wayk Den by release.
 
+== 2020.2.3 (2020-08-03)
+  * Add initial Wayk Den enrollment token for Wayk Now automation
+  * Add automatic machine name alias usable as target id for all servers
+  * Add automatic fully qualified DNS name alias for domain-joined machines
+  * Allow SRD connections with matching Active Directory user on target machine
+
 == 2020.2.2 (2020-07-06)
   * Fix User-Agent parsing
   * Fix an issue where an old client moving to 2020.2.0 had its Den ID reset
