@@ -221,6 +221,47 @@ PS > Set-WaykDenConfig -JetRelayUrl https://api.jet-relay.net
 
 Continue your initial configuration, and once you know it is working, come back to the link:docs\getting-started-relay.adoc[Devolutions Jet] page for more information on how to deploy your own relays.
 
+== link:docs\database-management.adoc[Database Management]
+
+== link:docs\user-management.adoc[User Management]
+
+== Running
+
+Start Wayk Den, and wait for all containers to start:
+
+[source, sh]
+----
+PS > Start-WaykDen
+----
+
+Once started, Wayk Den listens on http://localhost:4000 by default.
+
+Alternatively, if you want to see the complete docker commands executed by the "Start-WaykDen" command, you can use the '-Verbose' parameter:
+
+[source, sh]
+----
+PS > Start-WaykDen -Verbose
+----
+
+You can check that all containers are up and running with the `docker ps -f network=den-network` command.
+
+To confirm everything is correctly configured, you should be able to get a response from the Wayk Den well known configuration endpoint:
+
+[source, sh]
+----
+curl http://localhost:4000/.well-known/configuration
+{"den_router_uri":"https://den.contoso.net/cow","lucid_uri":"https://den.contoso.net/lucid","realm":"contoso.net","wayk_client_id":"zqdvSbCRWdDrj1fQXwzPQbCg"}
+----
+
+If you have correctly configured external access, you should be able to get the same response using the external configuration URL (https://den.contoso.net/.well-known/configuration).
+
+Stop Wayk Den, and wait for all containers to stop:
+
+[source, sh]
+----
+PS > Stop-WaykDen
+----
+
 === System Service
 
 It is possible to register a system service on Windows to automatically call Start-WaykDen / Stop-WaykDen in a given config directory.
@@ -282,86 +323,3 @@ PS > Unregister-WaykDenService -ServicePath $ConfigPath
 ----
 
 You can also update the service wrapper executable when never versions of the cmdlet are published by calling Register-WaykDenService again.
-
-== link:docs\database-management.adoc[Database Management]
-
-== Running
-
-Start Wayk Den, and wait for all microservices to start:
-
-[source, sh]
-----
-PS > Start-WaykDen
-----
-
-Once started, Wayk Den listens on http://localhost:4000 by default. We recommend using a reverse tunnel such as https://ngrok.com/[ngrok] or https://www.cloudflare.com/en-ca/products/argo-tunnel/[argo tunnels] from Cloudflare. In this case, a tunnel is used to expose localhost:4000 on the den.contoso.net external url.
-
-You can check that all containers are up and running with the `docker ps -f network=den-network` command.
-
-To confirm everything is correctly configured, you should be able to get a response from the Wayk Den well known configuration endpoint:
-
-[source, sh]
-----
-curl http://localhost:4000/.well-known/configuration
-{"den_router_uri":"https://den.contoso.net/cow","lucid_uri":"https://den.contoso.net/lucid","realm":"contoso.net","wayk_client_id":"zqdvSbCRWdDrj1fQXwzPQbCg"}
-----
-
-If you have correctly configured external access, you should be able to get the same response using the external configuration URL (https://den.contoso.net/.well-known/configuration).
-
-Stop Wayk Den, and wait for all microservices to stop:
-
-[source, sh]
-----
-PS > Stop-WaykDen
-----
-
-=== User Management
-
-User using Wayk Now client can log in to be authenticated with Wayk Den Server. The server, by default, will provide a Wayk Den ID to any user who wants to connect to it.
-
-To authenticate user, Wayk Den can be configured to use a specific user group through LDAP integration. Two options are supported: Active Directory and JumpCloud. 
-
-In order to fetch user and group information, a user with read-only LDAP access must first be created.
-
-==== Active Directory
-
-To integrate Active Directory, here is a list of the required parameters:
-
-* LdapServerUrl: ldap://_ldap-server_
-* LdapUsername, LdapPassword
-* LdapUserGroup (optional)
-
-It is important to specify the server IP since there is not DNS resolution in the docker container. The user used should be a user with only read-only access. A section below explains how to create a such user. Finally, the user group is not mandatory. If it is not specified, all users will be accepted. If it is specified, only users from that group will be able to be authenticated.
-
-The following command will set LDAP property value for active directory. 
-
-[source, sh]
-----
-Set-WaykDenConfig -LdapServerType ActiveDirectory -LdapUsername ldap-user@contoso.local -LdapPassword ldap-password -LdapServerUrl ldap://ldap-server -LdapUserGroup 'Domain Users'
----- 
-
-===== User creation with read-only access
-
-By default, a new user created in active directory has read-only access on the LDAP server. But that user is also member of the group Domain Users by default. Being member of that group is enough to be able to use that user and log on any domain's computer. To avoid that, we suggest to use a user who is not a member of Domain Users group and has only read-only access on the LDAP server. To do that, a few steps is needed.
-
-First, a new group has to be created, let's say "Read-only Users". Then a new user can be created and added only to that group. After that, the new group can be set as primary group for the user. And finally, the user can be removed from the Domain Users group. This user should be used to configured WaykDen Server.
-
-==== JumpCloud
-
-https://jumpcloud.com/[JumpCloud] is a cloud service who help you to centralize user management. You can create users and groups then use the service call "LDAP-as-a-Service" to access those users and groups from WaykDen. You can read more on https://support.jumpcloud.com/customer/en/portal/articles/2439911-using-jumpcloud-s-ldap-as-a-service[how to use JumpCloud's LDAP-as-a-Service]. 
-
-To integrate Jump Cloud with Wayk Den, here is a list of the required parameters:
-
-* LdapServerUrl (ldaps://ldap.jumpcloud.com:636)
-* LdapUsername, LdapPassword
-* LdapBaseDn: Distinguished Name to retrieve users and groups
-* LdapUserGroup (optional)
-
-The LDAP server url should be set to ldaps://ldap.jumpcloud.com:636. JumpCloud provide a non secure access as well, but we don't recommand it. A user who can read the ldap directory should be created following steps https://support.jumpcloud.com/customer/en/portal/articles/2439911-using-jumpcloud-s-ldap-as-a-service#createuser[here]. The username has to be provided with the Distinguished Name (DN), something like `uid=_LDAP_BINDING_USER_,ou=Users,o=_YOUR_ORG_ID_,dc=jumpcloud,dc=com`. The base DN is similar and should be set to `ou=Users,o=_YOUR_ORG_ID_,dc=jumpcloud,dc=com`. Finally, a user group name can be specified to limit user to that group.
-
-The following command will set LDAP property value for JumpCloud.
-
-[source, sh]
-----
-Set-WaykDenConfig -LdapServerType JumpCloud -LdapUsername "uid=ldap-user,ou=Users,o=YOUR_ORG_ID,dc=jumpcloud,dc=com" -LdapPassword ldap-password -LdapServerUrl ldaps://ldap.jumpcloud.com:636 -LdapBaseDn "ou=Users,o=YOUR_ORG_ID,dc=jumpcloud,dc=com -LdapUserGroup wayk-users"
-----
