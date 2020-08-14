@@ -283,37 +283,7 @@ PS > Unregister-WaykDenService -ServicePath $ConfigPath
 
 You can also update the service wrapper executable when never versions of the cmdlet are published by calling Register-WaykDenService again.
 
-== Data Persistence
-
-Aside from the Wayk Den configuration files, all Wayk Den data is stored inside a https://www.mongodb.com[MongoDB database]. If you do not specify a database, a simple MongoDB container will be launched with a docker volume attached to it. While this is fine for a lot of use cases, using a single MongoDB container instance is not suitable for high availability scenarios.
-
-To point Wayk Den to an existing MongoDB server, you need to configure a database connection string, and set MongoDB as external to avoid launching a MongoDB container instance:
-
-----
-PS > Set-WaykDenConfig -MongoExternal $true -MongoUrl 'mongodb://mongo-server:27017'
-----
-
-=== Database Backup
-
-MongoDB database backups can be done using the https://docs.mongodb.com/manual/reference/program/mongodump/[`mongodump` command-line tool]. For simplicity, the `Backup-WaykDenData` command can be used to streamline the process:
-
-----
-PS > Backup-WaykDenData -BackupPath .\den-backup.tgz -Verbose
-----
-
-The `Backup-WaykDenData` is only usable with a non-external MongoDB database. You can add the `-Verbose` parameter to show the docker commands used to call `mongodump` inside a container for reference.
-
-=== Database Restore
-
-A MongoDB database can be restored from a backup using the https://docs.mongodb.com/manual/reference/program/mongorestore/[`mongorestore` command-line tool]. For obvious reasons, you should be careful about restoring a database, as the operation will overwrite the current data and replace it with the one from the backup.
-
-Just like `Backup-WaykDenData`, `Restore-WaykDenData` should only be used with a non-external MongoDB database. A proper restore involves stopping Wayk Den, restoring data from the backup file, then restarting Wayk Den. Since Stop-WaykDen stops the database container, `Restore-WaykDenData` will automatically start it for the restore operation.
-
-----
-PS > Stop-WaykDen
-PS > Restore-WaykDenData -BackupPath .\den-backup.tgz -Verbose
-PS > Restart-WaykDen
-----
+== link:docs\database-management.adoc[Database Management]
 
 == Running
 
