@@ -221,10 +221,6 @@ PS > Set-WaykDenConfig -JetRelayUrl https://api.jet-relay.net
 
 Continue your initial configuration, and once you know it is working, come back to the link:docs\getting-started-relay.adoc[Devolutions Jet] page for more information on how to deploy your own relays.
 
-== link:docs\database-management.adoc[Database Management]
-
-== link:docs\user-management.adoc[User Management]
-
 == Running
 
 Start Wayk Den, and wait for all containers to start:
@@ -323,3 +319,9 @@ PS > Unregister-WaykDenService -ServicePath $ConfigPath
 ----
 
 You can also update the service wrapper executable when never versions of the cmdlet are published by calling Register-WaykDenService again.
+
+== link:docs\database-management.adoc[Database Management]
+
+== link:docs\user-management.adoc[User Management]
+
+== link:docs\deployment-automation.adoc[Deployment Automation]
