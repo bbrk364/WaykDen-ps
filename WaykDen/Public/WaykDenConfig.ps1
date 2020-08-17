@@ -32,8 +32,9 @@ class WaykDenConfig
     [string] $TraefikImage
 
     # Jet
-    [bool] $JetExternal
     [string] $JetRelayUrl
+    [int] $JetTcpPort
+    [bool] $JetExternal
     [string] $JetRelayImage
 
     # LDAP
@@ -284,13 +285,16 @@ function Expand-WaykDenConfig
         $config.DenRouterUrl = $DenRouterUrlDefault
     }
 
-    if (-Not $config.JetRelayUrl) {
-        if ($config.JetExternal) {
+    if ($config.JetExternal) {
+        if (-Not $config.JetRelayUrl) {
             $config.JetRelayUrl = $JetRelayUrlDefault
-        } else {
-            if ($config.ExternalUrl) {
-                $config.JetRelayUrl = $config.ExternalUrl
-            }
+        }
+    } else {
+        if (-Not $config.JetRelayUrl) {
+            $config.JetRelayUrl = $config.ExternalUrl
+        }
+        if (-Not $config.JetTcpPort) {
+            $config.JetTcpPort = 8080
         }
     }
 
@@ -318,7 +322,8 @@ function Export-TraefikToml()
         -LucidUrl $config.LucidUrl `
         -PickyUrl $config.PickyUrl `
         -DenRouterUrl $config.DenRouterUrl `
-        -DenServerUrl $config.DenServerUrl
+        -DenServerUrl $config.DenServerUrl `
+        -JetExternal $config.JetExternal
 
     Set-Content -Path $TraefikTomlFile -Value $TraefikToml
 }
@@ -397,8 +402,9 @@ function New-WaykDenConfig
         [string] $TraefikImage,
 
         # Jet
-        [bool] $JetExternal,
         [string] $JetRelayUrl,
+        [int] $JetTcpPort,
+        [bool] $JetExternal,
         [string] $JetRelayImage,
 
         # LDAP
@@ -517,8 +523,9 @@ function Set-WaykDenConfig
         [string] $TraefikImage,
 
         # Jet
-        [bool] $JetExternal,
         [string] $JetRelayUrl,
+        [int] $JetTcpPort,
+        [bool] $JetExternal,
         [string] $JetRelayImage,
 
         # LDAP

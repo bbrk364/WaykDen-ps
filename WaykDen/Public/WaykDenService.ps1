@@ -473,12 +473,17 @@ function Get-WaykDenService
     if (-Not $config.JetExternal) {
         $url = [System.Uri]::new($config.ExternalUrl)
         $JetInstance = $url.Host
-        $JetWssPort = $url.Port
-        $JetTcpPort = 8080
+        $JetWebPort = $url.Port
+        $JetWebScheme = $url.Scheme -Replace 'http', 'ws'
+
+        if ($config.JetTcpPort -gt 0) {
+            $JetTcpPort = $config.JetTcpPort
+            $JetListeners += "tcp://0.0.0.0:$JetTcpPort";
+        }
 
         $JetListeners = @()
-        #$JetListeners += "tcp://0.0.0.0:$JetTcpPort";
-        $JetListeners += "ws://0.0.0.0:7171,wss://<jet_instance>:$JetWssPort"
+        $JetListeners += "tcp://0.0.0.0:$JetTcpPort";
+        $JetListeners += "ws://0.0.0.0:7171,${JetWebScheme}://<jet_instance>:${JetWebPort}"
 
         $JetRelay = [DockerService]::new()
         $JetRelay.ContainerName = 'devolutions-jet'
@@ -486,15 +491,27 @@ function Get-WaykDenService
         $JetRelay.Platform = $Platform
         $JetRelay.Isolation = $Isolation
         $JetRelay.RestartPolicy = $RestartPolicy
-        $JetRelay.TargetPorts = @(10256,$JetTcpPort)
+        $JetRelay.TargetPorts = @()
+
+        if ($JetTcpPort -gt 0) {
+            # Register only TCP port to be published automatically
+            $JetRelay.TargetPorts += $JetTcpPort
+            $JetRelay.PublishAll = $true
+        }
 
         foreach ($JetListener in $JetListeners) {
             $ListenerUrl = ([string[]] $($JetListener -Split ','))[0]
             $url = [System.Uri]::new($ListenerUrl)
-            $JetRelay.TargetPorts += @($url.Port)
+            # Don't register non-TCP ports to avoid publishing them
+            #$JetRelay.TargetPorts += @($url.Port)
         }
 
-        $JetRelay.PublishAll = $true
+        if ($DenNetwork -NotMatch "none") {
+            $JetRelay.Networks += $DenNetwork
+        } else {
+            $JetRelay.PublishAll = $true
+        }
+
         $JetRelay.Environment = [ordered]@{
             "JET_INSTANCE" = $JetInstance;
             "JET_UNRESTRICTED" = "true";
@@ -503,12 +520,12 @@ function Get-WaykDenService
         }
         $JetRelay.External = $false
 
-        $args = @()
+        $JetArgs = @()
         foreach ($JetListener in $JetListeners) {
-            $args += @('-l', "`"$JetListener`"")
+            $JetArgs += @('-l', "`"$JetListener`"")
         }
 
-        $JetRelay.Command = $($args -Join " ")
+        $JetRelay.Command = $($JetArgs -Join " ")
 
         $Services += $JetRelay
     }

@@ -103,6 +103,17 @@ logLevel = "INFO"
     entrypoints = ["${TraefikEntrypoint}"]
 '
 
+    if (-Not $JetExternal) {
+        $templates += '
+    [frontends.jet-relay]
+    passHostHeader = true
+    backend = "jet-relay"
+    entrypoints = ["${TraefikEntrypoint}"]
+        [frontends.jet-relay.routes.jet-relay]
+        rule = "PathPrefix:/jet"
+'
+    }
+
     $templates += '
 [backends]
     [backends.lucid]
@@ -128,6 +139,16 @@ logLevel = "INFO"
         weight = 10
         method="drr"
 '
+
+    if (-Not $JetExternal) {
+            $templates += '
+    [backends.jet-relay]
+        [backends.jet-relay.servers.jet-relay]
+        url = "http://devolutions-jet:7171"
+        weight = 10
+        method="drr"
+'
+    }
 
     $template = -Join $templates
 
