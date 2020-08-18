@@ -707,6 +707,7 @@ function Start-WaykDen
     $ConfigPath = Find-WaykDenConfig -ConfigPath:$ConfigPath
     $config = Get-WaykDenConfig -ConfigPath:$ConfigPath
     Expand-WaykDenConfig -Config $config
+    Test-WaykDenConfig -Config:$config
 
     Test-DockerHost
 
