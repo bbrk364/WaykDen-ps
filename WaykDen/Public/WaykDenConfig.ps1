@@ -16,24 +16,26 @@ class WaykDenConfig
     [string] $DenServerUrl
     [string] $DenRouterUrl
     [string] $DenApiKey
-    [bool] $DisableTelemetry
-    [bool] $ExperimentalFeatures
-    [bool] $ServerExternal
+    [bool] $DisableTelemetry = $false
+    [bool] $ExperimentalFeatures = $false
+    [bool] $ServerExternal = $false
     [string] $ServerImage
 
     # MongoDB
     [string] $MongoUrl
     [string] $MongoVolume
-    [bool] $MongoExternal
+    [bool] $MongoExternal = $false
     [string] $MongoImage
 
     # Traefik
-    [bool] $TraefikExternal
+    [bool] $TraefikExternal = $false
     [string] $TraefikImage
 
     # Jet
     [string] $JetRelayUrl
-    [string] $JetServerUrl
+    [int] $JetTcpPort
+    [bool] $JetExternal = $false
+    [string] $JetRelayImage
 
     # LDAP
     [string] $LdapServerUrl
@@ -44,12 +46,12 @@ class WaykDenConfig
     [string] $LdapServerType
     [string] $LdapBaseDn
     [string] $LdapBindType
-    [bool] $LdapCertificateValidation
+    [bool] $LdapCertificateValidation = $false
 
     # Picky
     [string] $PickyUrl
     [string] $PickyApiKey
-    [bool] $PickyExternal
+    [bool] $PickyExternal = $false
     [string] $PickyImage
 
     # Lucid
@@ -57,20 +59,20 @@ class WaykDenConfig
     [string] $LucidApiKey
     [string] $LucidAdminUsername
     [string] $LucidAdminSecret
-    [bool] $LucidExternal
+    [bool] $LucidExternal = $false
     [string] $LucidImage
 
     # NATS
     [string] $NatsUrl
     [string] $NatsUsername
     [string] $NatsPassword
-    [bool] $NatsExternal
+    [bool] $NatsExternal = $false
     [string] $NatsImage
     
     # Redis
     [string] $RedisUrl
     [string] $RedisPassword
-    [bool] $RedisExternal
+    [bool] $RedisExternal = $false
     [string] $RedisImage
 
     # Docker
@@ -217,7 +219,6 @@ function Expand-WaykDenConfig
     $MongoVolumeDefault = "den-mongodata"
     $ServerModeDefault = "Private"
     $ListenerUrlDefault = "http://0.0.0.0:4000"
-    $JetServerUrlDefault = "api.jet-relay.net:8080"
     $JetRelayUrlDefault = "https://api.jet-relay.net"
     $PickyUrlDefault = "http://den-picky:12345"
     $LucidUrlDefault = "http://den-lucid:4242"
@@ -268,14 +269,6 @@ function Expand-WaykDenConfig
         $config.MongoVolume = $MongoVolumeDefault
     }
 
-    if (-Not $config.JetServerUrl) {
-        $config.JetServerUrl = $JetServerUrlDefault
-    }
-
-    if (-Not $config.JetRelayUrl) {
-        $config.JetRelayUrl = $JetRelayUrlDefault
-    }
-
     if (-Not $config.PickyUrl) {
         $config.PickyUrl = $PickyUrlDefault
     }
@@ -290,6 +283,19 @@ function Expand-WaykDenConfig
 
     if (-Not $config.DenRouterUrl) {
         $config.DenRouterUrl = $DenRouterUrlDefault
+    }
+
+    if ($config.JetExternal) {
+        if (-Not $config.JetRelayUrl) {
+            $config.JetRelayUrl = $JetRelayUrlDefault
+        }
+    } else {
+        if (-Not $config.JetRelayUrl) {
+            $config.JetRelayUrl = $config.ExternalUrl
+        }
+        if (-Not $config.JetTcpPort) {
+            $config.JetTcpPort = 8080
+        }
     }
 
     Expand-WaykDenConfigImage -Config:$Config
@@ -316,7 +322,8 @@ function Export-TraefikToml()
         -LucidUrl $config.LucidUrl `
         -PickyUrl $config.PickyUrl `
         -DenRouterUrl $config.DenRouterUrl `
-        -DenServerUrl $config.DenServerUrl
+        -DenServerUrl $config.DenServerUrl `
+        -JetExternal $config.JetExternal
 
     Set-Content -Path $TraefikTomlFile -Value $TraefikToml
 }
@@ -396,6 +403,9 @@ function New-WaykDenConfig
 
         # Jet
         [string] $JetRelayUrl,
+        [int] $JetTcpPort,
+        [bool] $JetExternal,
+        [string] $JetRelayImage,
 
         # LDAP
         [string] $LdapServerUrl,
@@ -477,6 +487,9 @@ function New-WaykDenConfig
 
     Expand-WaykDenConfigKeys -Config:$config
 
+    # remove default properties from object
+    $config = Remove-DefaultProperties $config $([WaykDenConfig]::new())
+
     ConvertTo-Yaml -Data (ConvertTo-SnakeCaseObject -Object $config) -OutFile $ConfigFile -Force:$Force
 
     Export-TraefikToml -ConfigPath:$ConfigPath
@@ -514,6 +527,9 @@ function Set-WaykDenConfig
 
         # Jet
         [string] $JetRelayUrl,
+        [int] $JetTcpPort,
+        [bool] $JetExternal,
+        [string] $JetRelayImage,
 
         # LDAP
         [string] $LdapServerUrl,
@@ -582,6 +598,9 @@ function Set-WaykDenConfig
     }
 
     Expand-WaykDenConfigKeys -Config:$config
+
+    # remove default properties from object
+    $config = Remove-DefaultProperties $config $([WaykDenConfig]::new())
  
     # always force overwriting wayk-den.yml when updating the config file
     ConvertTo-Yaml -Data (ConvertTo-SnakeCaseObject -Object $config) -OutFile $ConfigFile -Force
@@ -595,7 +614,8 @@ function Get-WaykDenConfig
     [OutputType('WaykDenConfig')]
     param(
         [string] $ConfigPath,
-        [switch] $Expand
+        [switch] $Expand,
+        [switch] $NonDefault
     )
 
     $ConfigPath = Find-WaykDenConfig -ConfigPath:$ConfigPath
@@ -622,6 +642,11 @@ function Get-WaykDenConfig
 
     if ($Expand) {
         Expand-WaykDenConfig $config
+    }
+
+    if ($NonDefault) {
+        # remove default properties from object
+        $config = Remove-DefaultProperties $config $([WaykDenConfig]::new())
     }
 
     return $config
@@ -659,6 +684,9 @@ function Clear-WaykDenConfig
             }
         }
     }
+
+    # remove default properties from object
+    $config = Remove-DefaultProperties $config $([WaykDenConfig]::new())
 
     # always force overwriting wayk-den.yml when updating the config file
     ConvertTo-Yaml -Data (ConvertTo-SnakeCaseObject -Object $config) -OutFile $ConfigFile -Force
