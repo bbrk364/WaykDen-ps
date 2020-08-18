@@ -16,25 +16,25 @@ class WaykDenConfig
     [string] $DenServerUrl
     [string] $DenRouterUrl
     [string] $DenApiKey
-    [bool] $DisableTelemetry
-    [bool] $ExperimentalFeatures
-    [bool] $ServerExternal
+    [bool] $DisableTelemetry = $false
+    [bool] $ExperimentalFeatures = $false
+    [bool] $ServerExternal = $false
     [string] $ServerImage
 
     # MongoDB
     [string] $MongoUrl
     [string] $MongoVolume
-    [bool] $MongoExternal
+    [bool] $MongoExternal = $false
     [string] $MongoImage
 
     # Traefik
-    [bool] $TraefikExternal
+    [bool] $TraefikExternal = $false
     [string] $TraefikImage
 
     # Jet
     [string] $JetRelayUrl
     [int] $JetTcpPort
-    [bool] $JetExternal
+    [bool] $JetExternal = $false
     [string] $JetRelayImage
 
     # LDAP
@@ -46,12 +46,12 @@ class WaykDenConfig
     [string] $LdapServerType
     [string] $LdapBaseDn
     [string] $LdapBindType
-    [bool] $LdapCertificateValidation
+    [bool] $LdapCertificateValidation = $false
 
     # Picky
     [string] $PickyUrl
     [string] $PickyApiKey
-    [bool] $PickyExternal
+    [bool] $PickyExternal = $false
     [string] $PickyImage
 
     # Lucid
@@ -59,20 +59,20 @@ class WaykDenConfig
     [string] $LucidApiKey
     [string] $LucidAdminUsername
     [string] $LucidAdminSecret
-    [bool] $LucidExternal
+    [bool] $LucidExternal = $false
     [string] $LucidImage
 
     # NATS
     [string] $NatsUrl
     [string] $NatsUsername
     [string] $NatsPassword
-    [bool] $NatsExternal
+    [bool] $NatsExternal = $false
     [string] $NatsImage
     
     # Redis
     [string] $RedisUrl
     [string] $RedisPassword
-    [bool] $RedisExternal
+    [bool] $RedisExternal = $false
     [string] $RedisImage
 
     # Docker
@@ -487,6 +487,9 @@ function New-WaykDenConfig
 
     Expand-WaykDenConfigKeys -Config:$config
 
+    # remove default properties from object
+    $config = Remove-DefaultProperties $config $([WaykDenConfig]::new())
+
     ConvertTo-Yaml -Data (ConvertTo-SnakeCaseObject -Object $config) -OutFile $ConfigFile -Force:$Force
 
     Export-TraefikToml -ConfigPath:$ConfigPath
@@ -595,6 +598,9 @@ function Set-WaykDenConfig
     }
 
     Expand-WaykDenConfigKeys -Config:$config
+
+    # remove default properties from object
+    $config = Remove-DefaultProperties $config $([WaykDenConfig]::new())
  
     # always force overwriting wayk-den.yml when updating the config file
     ConvertTo-Yaml -Data (ConvertTo-SnakeCaseObject -Object $config) -OutFile $ConfigFile -Force
@@ -608,7 +614,8 @@ function Get-WaykDenConfig
     [OutputType('WaykDenConfig')]
     param(
         [string] $ConfigPath,
-        [switch] $Expand
+        [switch] $Expand,
+        [switch] $NonDefault
     )
 
     $ConfigPath = Find-WaykDenConfig -ConfigPath:$ConfigPath
@@ -635,6 +642,11 @@ function Get-WaykDenConfig
 
     if ($Expand) {
         Expand-WaykDenConfig $config
+    }
+
+    if ($NonDefault) {
+        # remove default properties from object
+        $config = Remove-DefaultProperties $config $([WaykDenConfig]::new())
     }
 
     return $config
@@ -672,6 +684,9 @@ function Clear-WaykDenConfig
             }
         }
     }
+
+    # remove default properties from object
+    $config = Remove-DefaultProperties $config $([WaykDenConfig]::new())
 
     # always force overwriting wayk-den.yml when updating the config file
     ConvertTo-Yaml -Data (ConvertTo-SnakeCaseObject -Object $config) -OutFile $ConfigFile -Force

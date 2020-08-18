@@ -47,3 +47,26 @@ function ConvertTo-SnakeCaseObject
 
     return $snake_obj
 }
+
+function Remove-DefaultProperties
+{
+    param(
+        [Parameter(Position=0)]
+        $DirtyObject,
+        [Parameter(Position=1)]
+        $DefaultObject
+    )
+
+    $CleanObject = New-Object -TypeName 'PSObject'
+
+    $DirtyObject.PSObject.Properties | ForEach-Object {
+        $name = $_.Name
+        $value = $_.Value
+
+        if (-Not ($DefaultObject.($name) -eq $value)) {
+            $CleanObject | Add-Member -MemberType NoteProperty -Name $name -Value $value
+        }
+    }
+
+    return $CleanObject
+}
