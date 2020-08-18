@@ -301,6 +301,29 @@ function Expand-WaykDenConfig
     Expand-WaykDenConfigImage -Config:$Config
 }
 
+function Test-WaykDenConfig
+{
+    param(
+        [WaykDenConfig] $Config
+    )
+
+    if ($config.ListenerUrl) {
+        $url = [System.Uri]::new($config.ListenerUrl)
+
+        if (-Not (($url.Scheme -eq 'http') -Or ($url.Scheme -eq 'https'))) {
+            Write-Warning "Invalid ListenerUrl: $($url.OriginalString) (should begin with 'http://' or 'https://')"
+        }
+    }
+
+    if ($config.ExternalUrl) {
+        $url = [System.Uri]::new($config.ExternalUrl)
+
+        if (-Not (($url.Scheme -eq 'http') -Or ($url.Scheme -eq 'https'))) {
+            Write-Warning "Invalid ExternalUrl: $($url.OriginalString) (should begin with 'http://' or 'https://')"
+        }
+    }
+}
+
 function Export-TraefikToml()
 {
     param(
