@@ -120,4 +120,10 @@ image::images/iis_https_site_binding.png[IIS HTTPS site binding]
 
 Select "https" as the binding type, and enter your IIS site host name. Check "Require Server Name Indication" and "Disable HTTP/2". Click "Select...", then select the server certificate that was previously imported. Click OK to create the new site binding.
 
-That's it! Make sure that Wayk Den is running (Start-WaykDen) and then try accessing it through the new IIS site (https://den.buzzword.marketing). If you run into issues, try resetting IIS once (iisreset command).
+That's it! Your IIS site is now ready. Review your Wayk Den configuration ListenerUrl and ExternalUrl parameters to make sure they correspond to your current configuration:
+
+----
+Set-WaykDenConfig -ListenerUrl 'http://localhost:4000' -ExternalUrl 'https://den.buzzword.marketing'
+----
+
+Then start Wayk Den, and you should now be able to access it through your IIS site. If it doesn't work the first time, try running 'iisreset' once to force the configuration changes made earlier.
