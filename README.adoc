@@ -13,6 +13,8 @@ Make sure you have all software prerequisites (<<Installation>> section) then re
 * link:docs\getting-started-relay.adoc[getting started guide (Relay servers)].
 * link:docs\getting-started-acme.adoc[getting started guide (ACME/letsencrypt)].
 
+* link:docs\iis-deployment.adoc[IIS deployment guide].
+
 Once you have been familiarized with Wayk Den, come back to this page for more details on specific aspects of the software.
 
 == Installation

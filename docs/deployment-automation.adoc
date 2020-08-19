@@ -52,11 +52,11 @@ The alternative is to extract and use the full token data, such that the only th
 
 To extract the enrollment token data, click on the vertical ellipsis (&#8942;) button besides the enrollment token, and select "View full token":
 
-image::images/den_enrollment_token_actions.png[]
+image::images/den_enrollment_token_actions.png[Enrollment Token - Actions]
 
 The full token data will be presented for you to copy to the clipboard. This long string is a valid JSON Web Token (JWT), and its contents can be inspected by pasting it in the https://jwt.io/[jwt.io debugger tool].
 
-image::images/den_enrollment_token_data.png[]
+image::images/den_enrollment_token_data.png[Enrollment Token - Data]
 
 For automated enrollment, save this token to a file on disk (such as 'C:\token.txt') and then use the 'wayk-now enroll' command:
 
