@@ -91,6 +91,10 @@ function Find-WaykDenConfig
     )
 
     if (-Not $ConfigPath) {
+        $ConfigPath = Get-WaykDenPath 'ConfigPath'
+    }
+
+    if (Test-Path -Path $(Join-Path $(Get-Location) "wayk-den.yml") -PathType "Leaf") {
         $ConfigPath = Get-Location
     }
 
@@ -115,9 +119,9 @@ function Get-WaykDenPath()
 {
 	[CmdletBinding()]
 	param(
-		[Parameter(Mandatory,Position=0)]
+		[Parameter(Position=0)]
         [ValidateSet("ConfigPath","GlobalPath","LocalPath")]
-		[string] $PathType
+		[string] $PathType = "ConfigPath"
 	)
 
     $DisplayName = "Wayk Den"
@@ -134,7 +138,7 @@ function Get-WaykDenPath()
 	} elseif ($IsLinux) {
 		$LocalPath = "$HomePath/.config/${LowerName}"
 		$GlobalPath = "/etc/${LowerName}"
-	}
+    }
 
 	switch ($PathType) {
 		'LocalPath' { $LocalPath }
@@ -142,6 +146,19 @@ function Get-WaykDenPath()
         'ConfigPath' { $GlobalPath }
 		default { throw("Invalid path type: $PathType") }
 	}
+}
+
+function Enter-WaykDenConfigPath()
+{
+	[CmdletBinding()]
+	param(
+		[Parameter(Position=0)]
+        [ValidateSet("ConfigPath","GlobalPath","LocalPath")]
+		[string] $PathType = "ConfigPath"
+	)
+
+    $WaykDenPath = Find-WaykDenConfig
+    Set-Location $WaykDenPath
 }
 
 function Expand-WaykDenConfigKeys
@@ -715,5 +732,18 @@ function Clear-WaykDenConfig
     ConvertTo-Yaml -Data (ConvertTo-SnakeCaseObject -Object $config) -OutFile $ConfigFile -Force
 }
 
+function Remove-WaykDenConfig
+{
+    [CmdletBinding()]
+    param(
+        [string] $ConfigPath
+    )
+
+    $ConfigPath = Find-WaykDenConfig -ConfigPath:$ConfigPath
+    Remove-Item -Path $(Join-Path $ConfigPath 'wayk-den.yml')
+    Remove-Item -Path $(Join-Path $ConfigPath 'den-server') -Recurse
+    Remove-Item -Path $(Join-Path $ConfigPath 'traefik') -Recurse
+}
+
 Export-ModuleMember -Function New-WaykDenConfig, Set-WaykDenConfig, Get-WaykDenConfig, `
-    Clear-WaykDenConfig, Set-WaykDenConfigPath, Get-WaykDenPath
+    Clear-WaykDenConfig, Remove-WaykDenConfig, Set-WaykDenConfigPath, Enter-WaykDenConfigPath, Get-WaykDenPath
