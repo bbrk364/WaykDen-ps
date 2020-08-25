@@ -19,9 +19,9 @@ function Get-Netstat
             $State = $line[5]
 
             # Linux uses ':' separator for port
-            $LocalPort = $($LocalAddress -Split ':')[-1]
+            $LocalPort = $($LocalAddress -Split ':')[-1] -as [int]
 
-            New-Object -TypeName PSObject -Property @{
+            [PSCustomObject]@{
                 Protocol = $Protocol
                 LocalAddress = $LocalAddress
                 LocalPort = $LocalPort
@@ -48,9 +48,9 @@ function Get-Netstat
 
             # macOS uses '.' separator for port, replace it with ':'
             $LocalAddress = $LocalAddress -Replace '(.+)\.(\d+)', '$1:$2'
-            $LocalPort = $($LocalAddress -Split ':')[-1]
+            $LocalPort = $($LocalAddress -Split ':')[-1] -as [int]
 
-            New-Object -TypeName PSObject -Property @{
+            [PSCustomObject]@{
                 Protocol = $Protocol
                 LocalAddress = $LocalAddress
                 LocalPort = $LocalPort
@@ -76,7 +76,7 @@ function Get-Netstat
             $State = $line[3]
 
             # Windows uses ':' separator for port
-            $LocalPort = $($LocalAddress -Split ':')[-1]
+            $LocalPort = $($LocalAddress -Split ':')[-1] -as [int]
 
             # Normalize TCP state names according to
             # https://tools.ietf.org/html/rfc793#section-3.2
@@ -85,7 +85,7 @@ function Get-Netstat
                 $State = 'LISTEN' 
             }
 
-            New-Object -TypeName PSObject -Property @{
+            [PSCustomObject]@{
                 Protocol = $Protocol
                 LocalAddress = $LocalAddress
                 LocalPort = $LocalPort
@@ -96,4 +96,10 @@ function Get-Netstat
     }
 }
 
-Get-Netstat
+function Get-LocalTcpPorts
+{
+    Get-Netstat | Select-Object -ExpandProperty 'LocalPort'
+}
+
+# Check if a TCP port is already taken:
+# $(Get-LocalTcpPorts).Contains(3389)
