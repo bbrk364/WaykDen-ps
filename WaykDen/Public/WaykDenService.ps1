@@ -15,14 +15,14 @@ function Get-WaykDenImage
 
     $LucidVersion = '3.7.2'
     $PickyVersion = '4.5.0'
-    $ServerVersion = '2.7.0'
+    $ServerVersion = '2.8.0'
 
     $MongoVersion = '4.2'
     $TraefikVersion = '1.7'
     $NatsVersion = '2.1'
     $RedisVersion = '5.0'
 
-    $JetVersion = '0.11.0' # Update Get-JetImage as well
+    $JetVersion = '0.12.0' # Update Get-JetImage as well
 
     $images = if ($Platform -ne "windows") {
         [ordered]@{ # Linux containers
