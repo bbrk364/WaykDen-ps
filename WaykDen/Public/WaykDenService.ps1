@@ -22,7 +22,7 @@ function Get-WaykDenImage
     $NatsVersion = '2.1'
     $RedisVersion = '5.0'
 
-    $JetVersion = '0.11.0' # Update Get-JetImage as well
+    $JetVersion = '0.12.0' # Update Get-JetImage as well
 
     $images = if ($Platform -ne "windows") {
         [ordered]@{ # Linux containers
