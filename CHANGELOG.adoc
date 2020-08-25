@@ -2,6 +2,12 @@
 
 This document provides a list of notable changes introduced in Wayk Den by release.
 
+== 2020.2.4 (2020-08-25)
+  * Improve "All Servers" section to display servers by group
+  * Fix RBAC role assignment on machine groups
+  * Fix an issue where not all documents were shown if lot of documents were saved
+  * Fix an issue where a Wayk Now client connection with the Wayk Den server could failed
+
 == 2020.2.3 (2020-08-03)
   * Add initial Wayk Den enrollment token for Wayk Now automation
   * Add automatic machine name alias usable as target id for all servers
