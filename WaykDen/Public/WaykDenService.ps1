@@ -1,6 +1,7 @@
 
 . "$PSScriptRoot/../Private/PlatformHelper.ps1"
 . "$PSScriptRoot/../Private/DockerHelper.ps1"
+. "$PSScriptRoot/../Private/NetstatHelper.ps1"
 . "$PSScriptRoot/../Private/TraefikHelper.ps1"
 . "$PSScriptRoot/../Private/CmdletService.ps1"
 
@@ -656,6 +657,16 @@ function Start-DockerService
         if (Test-Path $WiredTigerLock) {
             Write-Host "Removing $WiredTigerLock"
             Remove-Item $WiredTigerLock -Force
+        }
+    }
+
+    if ($Service.PublishAll) {
+        $LocalTcpPorts = Get-LocalTcpPorts
+        foreach ($TargetPort in $Service.TargetPorts) {
+            if ($LocalTcpPorts.Contains($TargetPort)) {
+                Write-Warning "The $($Service.ContainerName) container wants to use TCP port ${TargetPort},"
+                Write-Warning "but this port is already used by another application on the host."
+            }
         }
     }
 
