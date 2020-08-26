@@ -1,0 +1,99 @@
+= Jet Relay Deployment
+
+== Simple relay server
+
+This is the default option: it launches a jet relay instance alongside Wayk Den, such that you do not need to configure it separately. The -JetServerUrl parameter does not need to be set, as it will automatically be derived from the Wayk Den -ExternalUrl parameter. This simplified deployment option is enabled when the -JetExternal parameter is set to false (default):
+
+----
+Set-WaykDenConfig -JetExternal $false
+----
+
+== Public relay servers
+
+It is possible to avoid deploying your own relay servers and point your private Wayk Den to the same relay servers used by the public Wayk Den:
+
+----
+Set-WaykDenConfig -JetExternal $true -JetServerUrl 'https://api.jet-relay.net'
+----
+
+== Private relay servers
+
+Open a PowerShell prompt, import the 'WaykDen' module and move to the same directory where you currently store Wayk Den files:
+
+----
+> Import-Module WaykDen
+> cd ~/den-test
+----
+
+Configure the relay with 'jet.buzzword.marketing' as the external hostname, along with two listeners. Here are three possible configurations, with or without TLS handled inside the jet relay:
+
+* external TCP/8080 -> listener TCP/8080
+* external WSS/443 -> listener WS/7171
+
+----
+Set-JetConfig -JetInstance 'jet.buzzword.marketing' -JetListeners @('tcp://0.0.0.0:8080', 'ws://0.0.0.0:7171,wss://<jet_instance>:443')
+----
+
+* external TCP/8080 -> listener TCP/8080
+* external WSS/443 -> listener WSS/7171
+
+----
+Set-JetConfig -JetInstance 'jet.buzzword.marketing' -JetListeners @('tcp://0.0.0.0:8080', 'wss://0.0.0.0:7171,wss://<jet_instance>:443')
+----
+
+* external TCP/8080 -> listener TCP/4040
+* external WSS/7171 -> listener WSS/7171
+
+----
+Set-JetConfig -JetInstance 'jet.buzzword.marketing' -JetListeners @('tcp://0.0.0.0:4040,tcp://0.0.0.0:8080', 'wss://0.0.0.0:7171,wss://<jet_instance>:7171')
+----
+
+A listener has the following format:
+<scheme>://<hostname>:<port>
+
+Where the hostname is '0.0.0.0' to listen on all network interfaces. For instance, "tcp://0.0.0.0:8080' is a TCP listener on port 8080.
+
+If the listener is exposed externally with a different scheme and port, the local and external URLs are separated by a comma:
+
+<scheme>://<hostname>:<port>,<scheme>://<hostname>:<port>
+
+To automatically use the configured hostname (jet instance), the special hostname value "<jet_instance>" can be used.
+
+For instance, 'wss://0.0.0.0:7171,wss://<jet_instance>:443' is a wss listener on port 7171 that will be exposed externally as 'wss://jet.buzzword.marketing'.
+
+Import a valid certificate for the Devolutions Jet server:
+
+----
+> Import-JetCertificate -CertificateFile .\fullchain.pfx -Password 'poshacme'
+----
+
+Start the Devolutions Jet relay:
+----
+> Start-JetRelay
+----
+
+Test that the Devolutions Jet relay can be reached externally:
+
+----
+> $JetRelayUrl = 'https://jet.buzzword.marketing'
+> Invoke-WebRequest "$JetRelayUrl/health"
+StatusCode        : 200
+StatusDescription : OK
+Content           : {74, 101, 116, 32...}
+RawContent        : HTTP/1.1 200 OK
+                    Content-Length: 71
+                    Date: Wed, 26 Aug 2020 02:01:52 GMT
+
+                    Jet instance "jet.buzzword.marketing" is alive and healthy.
+Headers           : {[Content-Length, 71], [Date, Wed, 26 Aug 2020 02:01:52 GMT]}
+RawContentLength  : 71
+----
+
+Make sure that the response contents corresponds to the service you are expecting (here it should begin with "Jet instance"), and that the status code is 200.
+
+Configure Wayk Den to use the new Devolutions Jet relay:
+
+----
+> Set-WaykDenConfig -JetExternal $true -JetRelayUrl 'https://jet.buzzword.marketing'
+> Restart-WaykDen
+----

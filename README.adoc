@@ -10,9 +10,9 @@ Make sure you have all software prerequisites (<<Installation>> section) then re
 
 * link:docs\getting-started-argo.adoc[getting started guide (Argo tunnel)]
 * link:docs\getting-started-azure.adoc[getting started guide (Azure VM)].
-* link:docs\getting-started-relay.adoc[getting started guide (Relay servers)].
 * link:docs\getting-started-acme.adoc[getting started guide (ACME/letsencrypt)].
 
+* link:docs\jet-relay-deployment.adoc[Jet relay deployment guide].
 * link:docs\iis-deployment.adoc[IIS deployment guide].
 
 Once you have been familiarized with Wayk Den, come back to this page for more details on specific aspects of the software.
@@ -210,19 +210,6 @@ PS > Import-WaykDenCertificate -CertificateFile /path/to/certificate.pem -Privat
 PS > Import-WaykDenCertificate -CertificateFile /path/to/certificate.pfx -Password <password>
 ----
 
-=== Relay Configuration
-
-To get started, it is recommended to try using our existing relay servers, even if you intend to deploy your own servers later on. It is the quickest path to getting something functional up and running.
-
-Set your Jet Relay Url to `https://api.jet-relay.net`:
-
-[source, sh]
-----
-PS > Set-WaykDenConfig -JetRelayUrl https://api.jet-relay.net
-----
-
-Continue your initial configuration, and once you know it is working, come back to the link:docs\getting-started-relay.adoc[Devolutions Jet] page for more information on how to deploy your own relays.
-
 == Running
 
 Start Wayk Den, and wait for all containers to start:
@@ -325,5 +312,7 @@ You can also update the service wrapper executable when never versions of the cm
 == link:docs\database-management.adoc[Database Management]
 
 == link:docs\user-management.adoc[User Management]
+
+== link:docs\jet-relay-deployment.adoc[Jet Relay Deployment].
 
 == link:docs\deployment-automation.adoc[Deployment Automation]
