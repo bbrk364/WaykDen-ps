@@ -25,7 +25,7 @@ function Backup-WaykDenData
         $TempPath = "/tmp"
     } else {
         $PathSeparator = "\"
-        $TempPath = "C:\temp"
+        $TempPath = "C:\Windows\temp"
     }
 
     if (-Not $BackupPath) {
@@ -85,7 +85,7 @@ function Restore-WaykDenData
         $TempPath = "/tmp"
     } else {
         $PathSeparator = "\"
-        $TempPath = "C:\temp"
+        $TempPath = "C:\Windows\temp"
     }
 
     $BackupFileName = "den-mongo.tgz"
