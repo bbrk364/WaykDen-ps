@@ -1,6 +1,13 @@
 
 function Get-Netstat
 {
+    $netstat = Get-Command -Name 'netstat' -ErrorAction SilentlyContinue
+
+    if (-Not $netstat) {
+        Write-Warning "netstat command not available"
+        return ,@()
+    }
+
     if ($IsLinux) {
         # Linux netstat:
         # Proto Recv-Q Send-Q Local Address           Foreign Address         State
@@ -98,7 +105,13 @@ function Get-Netstat
 
 function Get-LocalTcpPorts
 {
-    Get-Netstat | Select-Object -ExpandProperty 'LocalPort'
+    $netstat = Get-Netstat
+
+    if ($netstat) {
+        $netstat | Select-Object -ExpandProperty 'LocalPort'
+    } else {
+        return ,@()
+    }
 }
 
 # Check if a TCP port is already taken:
