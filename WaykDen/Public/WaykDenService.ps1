@@ -371,9 +371,7 @@ function Get-WaykDenService
     }
 
     if ($config.ExperimentalFeatures) {
-        $DenServer.Environment['DEN_SERVER_VERSION'] = '3'
-        $DenServer.Environment['WIP_FEATURE_ENROLLMENT'] = 'true'
-        $DenServer.Environment['WIP_FEATURE_WAYK_CLIENT'] = 'true'
+        $DenServer.Environment['WIP_EXPERIMENTAL_FEATURES'] = 'true'
     }
 
     if (![string]::IsNullOrEmpty($config.LdapServerUrl)) {
