@@ -4,6 +4,7 @@ This document provides a list of notable changes introduced in Wayk Den by relea
 
 == 2020.2.5 (???)
   * Fix Backup-WaykDenData/Restore-WaykDenData commands on Windows 
+  * Fix handling of netstat wrapper when the command is not available
 
 == 2020.2.4 (2020-08-25)
   * Improve "All Servers" section to display machines by group
