@@ -14,7 +14,7 @@ function Get-WaykDenImage
     $Platform = $config.DockerPlatform
 
     $LucidVersion = '3.7.2'
-    $PickyVersion = '4.5.0'
+    $PickyVersion = '4.6.0'
     $ServerVersion = '2.8.0'
 
     $MongoVersion = '4.2'
@@ -151,7 +151,6 @@ function Get-WaykDenService
     $JetRelayUrl = $config.JetRelayUrl
 
     $DenApiKey = $config.DenApiKey
-    $PickyApiKey = $config.PickyApiKey
     $LucidApiKey = $config.LucidApiKey
     $LucidAdminUsername = $config.LucidAdminUsername
     $LucidAdminSecret = $config.LucidAdminSecret
@@ -278,7 +277,6 @@ function Get-WaykDenService
     }
     $DenPicky.Environment = [ordered]@{
         "PICKY_REALM" = $Realm;
-        "PICKY_API_KEY" = $PickyApiKey;
         "PICKY_DATABASE_URL" = $MongoUrl;
         "PICKY_PROVISIONER_PUBLIC_KEY_PATH" = @($PickyDataPath, "picky-public.pem") -Join $PathSeparator
         "RUST_BACKTRACE" = $RustBacktrace;
@@ -340,7 +338,6 @@ function Get-WaykDenService
         "PICKY_REALM" = $Realm;
         "PICKY_URL" = $PickyUrl;
         "PICKY_EXTERNAL_URL" = "$ExternalUrl/picky";
-        "PICKY_API_KEY" = $PickyApiKey;
         "MONGO_URL" = $MongoUrl;
         "LUCID_AUTHENTICATION_KEY" = $LucidApiKey;
         "DEN_ROUTER_EXTERNAL_URL" = "$ExternalUrl/cow";
