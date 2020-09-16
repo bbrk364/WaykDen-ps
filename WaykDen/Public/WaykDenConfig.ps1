@@ -50,7 +50,6 @@ class WaykDenConfig
 
     # Picky
     [string] $PickyUrl
-    [string] $PickyApiKey
     [bool] $PickyExternal = $false
     [string] $PickyImage
 
@@ -169,10 +168,6 @@ function Expand-WaykDenConfigKeys
 
     if (-Not $config.DenApiKey) {
         $config.DenApiKey = New-RandomString -Length 32
-    }
-
-    if (-Not $config.PickyApiKey) {
-        $config.PickyApiKey = New-RandomString -Length 32
     }
 
     if (-Not $config.LucidApiKey) {
@@ -460,7 +455,6 @@ function New-WaykDenConfig
 
         # Picky
         [string] $PickyUrl,
-        [string] $PickyApiKey,
         [bool] $PickyExternal,
         [string] $PickyImage,
 
@@ -584,7 +578,6 @@ function Set-WaykDenConfig
 
         # Picky
         [string] $PickyUrl,
-        [string] $PickyApiKey,
         [bool] $PickyExternal,
         [string] $PickyImage,
 
