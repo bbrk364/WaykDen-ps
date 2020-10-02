@@ -309,6 +309,7 @@ function Get-WaykDenService
         "LUCID_API__ALLOWED_ORIGINS" = "$ExternalUrl";
         "LUCID_ACCOUNT__APIKEY" = $DenApiKey;
         "LUCID_ACCOUNT__LOGIN_URL" = "$DenServerUrl/account/login";
+        "LUCID_ACCOUNT__USER_EXISTS_URL" = "$DenServerUrl/account/user-exists";
         "LUCID_ACCOUNT__REFRESH_USER_URL" = "$DenServerUrl/account/refresh";
         "LUCID_ACCOUNT__FORGOT_PASSWORD_URL" = "$DenServerUrl/account/forgot";
         "LUCID_ACCOUNT__SEND_ACTIVATION_EMAIL_URL" = "$DenServerUrl/account/activation";
