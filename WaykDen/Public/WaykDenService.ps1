@@ -15,7 +15,7 @@ function Get-WaykDenImage
 
     $LucidVersion = '3.9.0'
     $PickyVersion = '4.6.0'
-    $ServerVersion = '2.8.0'
+    $ServerVersion = '2.11.0'
 
     $MongoVersion = '4.2'
     $TraefikVersion = '1.7'
@@ -28,7 +28,7 @@ function Get-WaykDenImage
         [ordered]@{ # Linux containers
             "den-lucid" = "devolutions/den-lucid:${LucidVersion}-buster-dev";
             "den-picky" = "devolutions/picky:${PickyVersion}-buster";
-            "den-server" = "devolutions/den-server:${ServerVersion}-buster";
+            "den-server" = "devolutions/den-server:${ServerVersion}-buster-dev";
 
             "den-mongo" = "library/mongo:${MongoVersion}-bionic";
             "den-traefik" = "library/traefik:${TraefikVersion}";
@@ -39,9 +39,9 @@ function Get-WaykDenImage
         }
     } else {
         [ordered]@{ # Windows containers
-            "den-lucid" = "devolutions/den-lucid:${LucidVersion}-servercore-ltsc2019";
+            "den-lucid" = "devolutions/den-lucid:${LucidVersion}-servercore-ltsc2019-dev";
             "den-picky" = "devolutions/picky:${PickyVersion}-servercore-ltsc2019";
-            "den-server" = "devolutions/den-server:${ServerVersion}-servercore-ltsc2019";
+            "den-server" = "devolutions/den-server:${ServerVersion}-servercore-ltsc2019-dev";
 
             "den-mongo" = "library/mongo:${MongoVersion}-windowsservercore-1809";
             "den-traefik" = "library/traefik:${TraefikVersion}-windowsservercore-1809";
