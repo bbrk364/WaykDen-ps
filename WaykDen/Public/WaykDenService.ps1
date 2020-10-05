@@ -14,7 +14,7 @@ function Get-WaykDenImage
     $Platform = $config.DockerPlatform
 
     $LucidVersion = '3.9.0'
-    $PickyVersion = '4.6.0'
+    $PickyVersion = '4.7.0'
     $ServerVersion = '2.11.0'
 
     $MongoVersion = '4.2'
