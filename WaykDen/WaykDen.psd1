@@ -7,7 +7,7 @@
     RootModule = 'WaykDen.psm1'
     
     # Version number of this module.
-    ModuleVersion = '2020.2.4'
+    ModuleVersion = '2020.2.5'
 
     # Supported PSEditions
     CompatiblePSEditions = 'Desktop', 'Core'
@@ -116,7 +116,7 @@
             # ReleaseNotes = ''
 
             # Prerelease string of this module
-            # Prerelease = ''
+            Prerelease = '-rc1'
 
             # Flag to indicate whether the module requires explicit user acceptance for install/update/save
             # RequireLicenseAcceptance = $false
