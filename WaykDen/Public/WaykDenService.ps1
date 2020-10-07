@@ -13,9 +13,9 @@ function Get-WaykDenImage
 
     $Platform = $config.DockerPlatform
 
-    $LucidVersion = '3.7.2'
-    $PickyVersion = '4.6.0'
-    $ServerVersion = '2.8.0'
+    $LucidVersion = '3.9.0'
+    $PickyVersion = '4.7.0'
+    $ServerVersion = '2.11.0'
 
     $MongoVersion = '4.2'
     $TraefikVersion = '1.7'
@@ -26,9 +26,9 @@ function Get-WaykDenImage
 
     $images = if ($Platform -ne "windows") {
         [ordered]@{ # Linux containers
-            "den-lucid" = "devolutions/den-lucid:${LucidVersion}-buster";
+            "den-lucid" = "devolutions/den-lucid:${LucidVersion}-buster-dev";
             "den-picky" = "devolutions/picky:${PickyVersion}-buster";
-            "den-server" = "devolutions/den-server:${ServerVersion}-buster";
+            "den-server" = "devolutions/den-server:${ServerVersion}-buster-dev";
 
             "den-mongo" = "library/mongo:${MongoVersion}-bionic";
             "den-traefik" = "library/traefik:${TraefikVersion}";
@@ -39,9 +39,9 @@ function Get-WaykDenImage
         }
     } else {
         [ordered]@{ # Windows containers
-            "den-lucid" = "devolutions/den-lucid:${LucidVersion}-servercore-ltsc2019";
+            "den-lucid" = "devolutions/den-lucid:${LucidVersion}-servercore-ltsc2019-dev";
             "den-picky" = "devolutions/picky:${PickyVersion}-servercore-ltsc2019";
-            "den-server" = "devolutions/den-server:${ServerVersion}-servercore-ltsc2019";
+            "den-server" = "devolutions/den-server:${ServerVersion}-servercore-ltsc2019-dev";
 
             "den-mongo" = "library/mongo:${MongoVersion}-windowsservercore-1809";
             "den-traefik" = "library/traefik:${TraefikVersion}-windowsservercore-1809";
@@ -302,18 +302,25 @@ function Get-WaykDenService
     $DenLucid.Environment = [ordered]@{
         "LUCID_ADMIN__SECRET" = $LucidAdminSecret;
         "LUCID_ADMIN__USERNAME" = $LucidAdminUsername;
-        "LUCID_AUTHENTICATION__KEY" = $LucidApiKey;
+        "LUCID_API__KEY" = $LucidApiKey;
         "LUCID_DATABASE__URL" = $MongoUrl;
-        "LUCID_TOKEN__ISSUER" = "$ExternalUrl/lucid";
+        "LUCID_TOKEN__DEFAULT_ISSUER" = "$ExternalUrl";
+        "LUCID_TOKEN__ISSUERS" = "${ListenerScheme}://localhost:$TraefikPort";
+        "LUCID_API__ALLOWED_ORIGINS" = "$ExternalUrl";
         "LUCID_ACCOUNT__APIKEY" = $DenApiKey;
         "LUCID_ACCOUNT__LOGIN_URL" = "$DenServerUrl/account/login";
+        "LUCID_ACCOUNT__USER_EXISTS_URL" = "$DenServerUrl/account/user-exists";
         "LUCID_ACCOUNT__REFRESH_USER_URL" = "$DenServerUrl/account/refresh";
         "LUCID_ACCOUNT__FORGOT_PASSWORD_URL" = "$DenServerUrl/account/forgot";
         "LUCID_ACCOUNT__SEND_ACTIVATION_EMAIL_URL" = "$DenServerUrl/account/activation";
         "LUCID_LOCALHOST_LISTENER" = $ListenerScheme;
+        "LUCID_LOGIN__ALLOW_UNVERIFIED_EMAIL_LOGIN" = "true";
+        "LUCID_LOGIN__PATH_PREFIX" = "lucid";
+        "LUCID_LOGIN__PASSWORD_DELEGATION" = "true"
         "LUCID_LOGIN__DEFAULT_LOCALE" = "en_US";
-        "RUST_BACKTRACE" = $RustBacktrace;
+        "RUST_BACKTRACE" = $RustBacktrace;   
     }
+
     $DenLucid.Healthcheck = [DockerHealthcheck]::new("curl -sS $LucidUrl/health")
     $DenLucid.External = $config.LucidExternal
     $Services += $DenLucid
