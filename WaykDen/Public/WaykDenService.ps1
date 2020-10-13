@@ -314,6 +314,7 @@ function Get-WaykDenService
         "LUCID_ACCOUNT__FORGOT_PASSWORD_URL" = "$DenServerUrl/account/forgot";
         "LUCID_ACCOUNT__SEND_ACTIVATION_EMAIL_URL" = "$DenServerUrl/account/activation";
         "LUCID_LOCALHOST_LISTENER" = $ListenerScheme;
+        "LUCID_LOGIN__ALLOW_FORGOT_PASSWORD" = "false";
         "LUCID_LOGIN__ALLOW_UNVERIFIED_EMAIL_LOGIN" = "true";
         "LUCID_LOGIN__PATH_PREFIX" = "lucid";
         "LUCID_LOGIN__PASSWORD_DELEGATION" = "true"
