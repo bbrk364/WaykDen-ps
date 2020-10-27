@@ -718,6 +718,19 @@ function Start-WaykDen
         [switch] $SkipPull
     )
 
+    Write-Warning "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+    Write-Warning "The 'WaykDen' PowerShell module is deprecated and replaced by 'WaykBastion'."
+    Write-Warning "Please follow the migration guide to upgrade from Wayk Den to Wayk Bastion:"
+    Write-Warning "https://docs.devolutions.net/wayk/bastion/migration-guide.html"
+    Write-Warning ""
+    Write-Warning "To learn more about the changes introduced in Wayk 2020.3, read our blogs posts:"
+    Write-Warning "https://blog.devolutions.net/2020/10/a-whole-new-wayk-the-future-of-wayk-den"
+    Write-Warning "https://blog.devolutions.net/2020/10/a-whole-new-wayk-the-future-of-wayk-now"
+    Write-Warning ""
+    Write-Warning "If you run into issues while upgrading or require assistance, please contact"
+    Write-Warning "one of our support agents at https://devolutions.net/support"
+    Write-Warning "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+
     $ConfigPath = Find-WaykDenConfig -ConfigPath:$ConfigPath
     $config = Get-WaykDenConfig -ConfigPath:$ConfigPath
     Expand-WaykDenConfig -Config $config
