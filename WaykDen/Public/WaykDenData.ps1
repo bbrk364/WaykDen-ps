@@ -50,7 +50,9 @@ function Backup-WaykDenData
     # make sure parent output directory exists
     New-Item -Path $(Split-Path -Path $BackupPath) -ItemType "Directory" -Force | Out-Null
 
-    $args = @('docker', 'exec', $ContainerName, 'mongodump', '--gzip', "--archive=${TempBackupPath}")
+    $MongoUrl = "mongodb://${ContainerName}:27017"
+    $args = @('docker', 'exec', $ContainerName, 'mongodump', '--gzip', `
+        "--archive=${TempBackupPath}", '--uri', $MongoUrl)
     $cmd = $args -Join " "
     Write-Verbose $cmd
     Invoke-Expression $cmd
@@ -112,7 +114,9 @@ function Restore-WaykDenData
     Write-Verbose $cmd
     Invoke-Expression $cmd
 
-    $args = @('docker', 'exec', $ContainerName, 'mongorestore', '--drop', '--gzip', "--archive=${TempBackupPath}")
+    $MongoUrl = "mongodb://${ContainerName}:27017"
+    $args = @('docker', 'exec', $ContainerName, 'mongorestore', '--drop', '--gzip', `
+        "--archive=${TempBackupPath}", '--uri', $MongoUrl)
     $cmd = $args -Join " "
     Write-Verbose $cmd
     Invoke-Expression $cmd

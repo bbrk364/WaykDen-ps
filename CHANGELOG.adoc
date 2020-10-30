@@ -2,6 +2,9 @@
 
 This document provides a list of notable changes introduced in Wayk Den by release.
 
+== 2020.3.0 (2020-10-30)
+  * Fix broken Backup/Restore for MongoDB Windows containers
+
 == 2020.3.0 (2020-10-27)
   * Deprecate WaykDen-PS
   * Rebranding Wayk Den to Wayk Bastion
